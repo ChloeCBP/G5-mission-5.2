@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Record Breakers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#132146;
+  --navy-light:#1c2f5e;
+  --navy-lighter:#28407a;
+  --gold:#f4b942;
+  --gold-dark:#d99b1f;
+  --coral:#ff6f61;
+  --coral-dark:#e6564a;
+  --teal:#2ec4b6;
+  --cream:#fffaf0;
+  --ink:#1a1a2e;
+  --green:#3ecf6a;
+  --red:#ff5c5c;
+  --shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0;padding:0;height:100%;width:100%;
+  font-family:'Poppins',sans-serif;
+  background:var(--navy);
+  color:var(--ink);
+  overflow:hidden;
+}
+#app{
+  position:fixed;inset:0;
+  width:100%;height:100%;
+  background:radial-gradient(circle at 50% 0%, var(--navy-lighter) 0%, var(--navy) 65%);
+  overflow:hidden;
+}
+.screen{
+  position:absolute;inset:0;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:20px 16px 40px;
+}
+.screen.active{display:flex;}
+.screen-inner{
+  width:100%;
+  max-width:clamp(460px, 62vw, 820px);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin:0 auto;
+}
+h1,h2,h3{margin:0;color:var(--cream);}
+p{margin:0;}
+button{
+  font-family:'Poppins',sans-serif;
+  cursor:pointer;
+  border:none;
+  outline:none;
+}
+.btn{
+  background:var(--gold);
+  color:var(--navy);
+  font-weight:700;
+  font-size:clamp(17px, 1.9vw, 24px);
+  padding:clamp(14px, 1.6vw, 20px) clamp(28px, 3vw, 40px);
+  border-radius:14px;
+  box-shadow:0 4px 0 var(--gold-dark);
+  transition:transform 0.08s ease;
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--gold-dark);}
+.btn.secondary{
+  background:transparent;
+  color:var(--cream);
+  border:2px solid rgba(255,255,255,0.35);
+  box-shadow:none;
+  font-weight:600;
+}
+.btn.secondary:active{transform:translateY(2px);}
+.btn.coral{
+  background:var(--coral);
+  color:#fff;
+  box-shadow:0 4px 0 var(--coral-dark);
+}
+.btn.coral:active{box-shadow:0 1px 0 var(--coral-dark);}
+.btn:disabled{opacity:0.4;pointer-events:none;}
+
+/* ---------- Title screen ---------- */
+#screen-title .screen-inner{justify-content:center;height:100%;text-align:center;gap:18px;}
+.title-emoji{font-size:64px;line-height:1;}
+.title-name{
+  font-size:clamp(38px, 4.2vw, 56px);font-weight:800;color:var(--gold);
+  text-shadow:0 3px 0 var(--navy);
+  letter-spacing:0.5px;
+}
+.title-sub{color:var(--cream);opacity:0.85;font-size:clamp(15px, 1.7vw, 20px);max-width:440px;}
+.title-buttons{display:flex;flex-direction:column;gap:12px;margin-top:14px;width:100%;max-width:340px;}
+
+/* ---------- Tutorial ---------- */
+.tut-card{
+  background:var(--cream);
+  border-radius:20px;
+  padding:26px 22px;
+  width:100%;
+  box-shadow:var(--shadow);
+  text-align:center;
+  margin-top:30px;
+}
+.tut-emoji{font-size:52px;margin-bottom:10px;}
+.tut-title{font-size:21px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+.tut-body{font-size:15px;color:#333;line-height:1.5;}
+.tut-nav{display:flex;justify-content:space-between;align-items:center;width:100%;margin-top:20px;}
+.tut-dots{display:flex;gap:6px;}
+.tut-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.3);}
+.tut-dot.active{background:var(--gold);}
+
+/* ---------- Hub ---------- */
+#screen-hub .screen-inner{padding-top:10px;gap:16px;}
+.hub-header{width:100%;display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+.hub-title{font-size:clamp(22px, 2.5vw, 30px);font-weight:800;color:var(--gold);}
+.hub-book-btn{
+  background:var(--navy-light);
+  border:2px solid var(--gold);
+  color:var(--cream);
+  border-radius:12px;
+  padding:clamp(8px, 1vw, 12px) clamp(12px, 1.4vw, 18px);
+  font-size:clamp(13px, 1.4vw, 16px);
+  font-weight:600;
+  display:flex;align-items:center;gap:6px;
+}
+.booth-grid{display:flex;flex-direction:column;gap:12px;width:100%;}
+.booth-card{
+  background:var(--navy-light);
+  border-radius:16px;
+  padding:clamp(16px, 1.8vw, 22px);
+  display:flex;
+  align-items:center;
+  gap:14px;
+  box-shadow:var(--shadow);
+  border:2px solid transparent;
+  position:relative;
+}
+.booth-card.locked{opacity:0.45;}
+.booth-card.done{border-color:var(--green);}
+.booth-icon{
+  font-size:clamp(34px, 3.8vw, 46px);
+  width:clamp(56px, 6.2vw, 76px);height:clamp(56px, 6.2vw, 76px);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--navy);
+  border-radius:14px;
+  flex-shrink:0;
+}
+.booth-info{flex:1;min-width:0;}
+.booth-name{color:var(--cream);font-weight:700;font-size:clamp(16px, 1.8vw, 21px);}
+.booth-desc{color:rgba(255,250,240,0.65);font-size:clamp(12px, 1.4vw, 15px);margin-top:2px;}
+.booth-progress{display:flex;gap:3px;margin-top:6px;}
+.stamp{
+  width:20px;height:20px;
+  border-radius:50%;
+  border:2px dashed rgba(255,255,255,0.35);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:800;
+  color:transparent;
+  flex-shrink:0;
+}
+.stamp.filled{
+  border:2px solid #C0453A;
+  color:#C0453A;
+  background:rgba(192,69,58,0.12);
+  transform:rotate(-8deg);
+}
+.booth-lock-icon{font-size:22px;color:rgba(255,255,255,0.6);}
+.booth-check{font-size:26px;color:var(--green);}
+
+/* ---------- Booth intro ---------- */
+.booth-intro-card{
+  background:var(--navy-light);
+  border-radius:20px;
+  padding:28px 22px;
+  text-align:center;
+  width:100%;
+  margin-top:20px;
+  box-shadow:var(--shadow);
+}
+.booth-intro-emoji{font-size:56px;}
+.booth-intro-title{color:var(--gold);font-size:22px;font-weight:800;margin-top:8px;}
+.booth-intro-desc{color:var(--cream);opacity:0.85;font-size:14px;margin-top:10px;line-height:1.5;}
+
+/* ---------- Play screen ---------- */
+#screen-play .screen-inner{padding-top:6px;gap:12px;}
+.play-topbar{width:100%;display:flex;align-items:center;gap:10px;}
+.play-main-row{display:flex;align-items:flex-start;gap:clamp(10px, 1.6vw, 20px);width:100%;}
+.play-progressbar{flex:1;height:clamp(10px, 1.1vw, 14px);background:rgba(255,255,255,0.15);border-radius:6px;overflow:hidden;}
+.play-progressfill{height:100%;background:var(--gold);border-radius:6px;transition:width 0.3s ease;}
+.play-exit{color:var(--cream);opacity:0.7;font-size:clamp(20px, 2.2vw, 26px);background:none;padding:4px 8px;}
+.record-badge{
+  background:var(--navy-light);
+  color:var(--cream);
+  font-size:clamp(12px, 1.3vw, 15px);
+  font-weight:600;
+  border-radius:10px;
+  padding:clamp(8px, 1vw, 12px) clamp(12px, 1.3vw, 16px);
+  display:flex;
+  align-items:center;
+  gap:8px;
+  width:100%;
+}
+.question-card{
+  background:var(--cream);
+  border-radius:20px;
+  padding:clamp(18px, 2.4vw, 34px) clamp(14px, 2vw, 28px);
+  flex:1;
+  min-width:0;
+  box-shadow:var(--shadow);
+  text-align:center;
+}
+.q-context{font-size:clamp(13px, 1.5vw, 17px);color:#666;font-weight:600;margin-bottom:8px;}
+.q-prompt{font-size:clamp(17px, 2.1vw, 25px);color:var(--ink);font-weight:600;line-height:1.4;margin-bottom:14px;}
+.q-visual{margin:10px 0 16px;}
+.q-fraction-display{
+  display:inline-flex;flex-direction:column;align-items:center;
+  font-size:clamp(22px, 3vw, 36px);font-weight:700;line-height:1.05;
+  margin:0 clamp(4px, 0.9vw, 10px);
+}
+.q-fraction-display .num{border-bottom:2.5px solid var(--ink);padding:0 6px 2px;}
+.q-fraction-display .den{padding:2px 6px 0;}
+.q-mixed-whole{font-size:clamp(26px, 3.6vw, 44px);font-weight:800;margin-right:4px;}
+.q-compare-row{display:flex;align-items:center;justify-content:center;gap:clamp(4px, 1.2vw, 14px);flex-wrap:wrap;font-size:clamp(22px, 3vw, 36px);font-weight:700;}
+.q-op{font-size:clamp(24px, 3.2vw, 38px);font-weight:800;color:var(--coral-dark);margin:0 6px;}
+
+.answer-area{margin-top:6px;}
+.compare-buttons{display:flex;gap:10px;justify-content:center;}
+.compare-btn{
+  width:64px;height:64px;
+  border-radius:16px;
+  background:var(--navy-light);
+  color:var(--cream);
+  font-size:26px;
+  font-weight:800;
+  box-shadow:0 4px 0 rgba(0,0,0,0.3);
+}
+.compare-btn:active{transform:translateY(3px);box-shadow:none;}
+.compare-btn.selected{background:var(--gold);color:var(--navy);}
+
+.symbol-circle-wrap{display:flex;justify-content:center;margin:4px 0;}
+.symbol-circle{
+  width:clamp(72px, 8vw, 100px);height:clamp(72px, 8vw, 100px);
+  border-radius:50%;
+  background:#fff;
+  border:3px dashed #bbb;
+  color:#999;
+  font-size:clamp(30px, 3.4vw, 42px);
+  font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 0 rgba(0,0,0,0.08);
+  transition:transform 0.08s ease;
+}
+.symbol-circle:active{transform:scale(0.94);}
+.symbol-circle.chosen{
+  border:3px solid var(--gold-dark);
+  color:var(--navy);
+  background:#fff8e6;
+}
+
+.symbol-picker-overlay{
+  position:absolute;inset:0;
+  background:rgba(10,14,30,0.6);
+  display:none;
+  align-items:flex-end;
+  justify-content:center;
+  z-index:70;
+  padding:0;
+}
+.symbol-picker-overlay.active{display:flex;}
+.symbol-picker-card{
+  background:var(--cream);
+  border-radius:24px 24px 0 0;
+  padding:clamp(26px, 2.8vw, 38px) clamp(24px, 2.6vw, 36px) clamp(34px, 3.6vw, 48px);
+  width:100%;
+  max-width:560px;
+  text-align:center;
+  box-shadow:0 -8px 30px rgba(0,0,0,0.4);
+  animation:sheetUp 0.22s ease;
+}
+@keyframes sheetUp{
+  from{transform:translateY(100%);}
+  to{transform:translateY(0);}
+}
+.symbol-picker-title{font-weight:700;color:var(--navy);font-size:clamp(16px, 1.8vw, 21px);margin-bottom:18px;}
+.symbol-picker-buttons{display:flex;gap:16px;justify-content:center;}
+.symbol-picker-btn{
+  width:clamp(76px, 8.4vw, 104px);height:clamp(76px, 8.4vw, 104px);
+  border-radius:50%;
+  background:var(--navy-light);
+  color:var(--cream);
+  font-size:clamp(30px, 3.4vw, 42px);
+  font-weight:800;
+  box-shadow:0 4px 0 rgba(0,0,0,0.3);
+}
+.symbol-picker-btn:active{transform:translateY(3px);box-shadow:none;}
+
+.mixed-input-row{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;}
+.mn-whole-wrap{display:flex;flex-direction:column;align-items:center;}
+.mn-frac-wrap{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.num-input{
+  width:clamp(56px, 6.2vw, 78px);height:clamp(52px, 5.8vw, 72px);
+  border:2px solid #ccc;
+  border-radius:10px;
+  font-size:clamp(20px, 2.4vw, 28px);
+  font-weight:700;
+  text-align:center;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  color:var(--ink);
+}
+.num-input:focus{border-color:var(--gold-dark);}
+.mn-divider{width:clamp(40px, 4.4vw, 56px);height:2.5px;background:var(--ink);margin:2px 0;}
+.mn-label{font-size:clamp(10px, 1.1vw, 13px);color:#888;margin-top:3px;font-weight:600;text-transform:uppercase;}
+
+.single-input-row{display:flex;justify-content:center;}
+.single-input{
+  width:clamp(120px, 13vw, 165px);height:clamp(56px, 6.2vw, 76px);
+  border:2px solid #ccc;
+  border-radius:12px;
+  font-size:clamp(24px, 2.8vw, 32px);
+  font-weight:700;
+  text-align:center;
+  font-family:'Poppins',sans-serif;
+  background:#fff;
+  color:var(--ink);
+}
+
+.submit-row{margin-top:18px;display:flex;justify-content:center;}
+
+.feedback-banner{
+  width:100%;
+  border-radius:14px;
+  padding:12px 16px;
+  text-align:center;
+  font-weight:700;
+  font-size:15px;
+  margin-top:4px;
+  display:none;
+}
+.feedback-banner.correct{background:rgba(62,207,106,0.18);color:#1a7a3a;border:2px solid var(--green);display:block;}
+.feedback-banner.incorrect{background:rgba(255,92,92,0.15);color:#b52d2d;border:2px solid var(--red);display:block;}
+
+/* line plot */
+.lineplot-wrap{background:#fff;border-radius:14px;padding:14px 10px 10px;margin:10px 0;overflow-x:auto;}
+.lineplot-track{position:relative;height:150px;min-width:280px;}
+.lineplot-axis{position:absolute;bottom:22px;left:10px;right:10px;height:2px;background:#333;}
+.lineplot-tick{position:absolute;bottom:4px;transform:translateX(-50%);font-size:11px;color:#333;font-weight:600;}
+.lineplot-tickmark{position:absolute;bottom:20px;width:2px;height:8px;background:#333;transform:translateX(-1px);}
+.lineplot-dot{
+  position:absolute;
+  width:16px;height:16px;
+  transform:translate(-50%,0);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;color:var(--coral-dark);font-weight:800;
+}
+.lineplot-legend{
+  display:flex;flex-wrap:wrap;gap:6px;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid #eee;
+}
+.lineplot-legend-item{
+  background:#f4f4f4;
+  border-radius:8px;
+  padding:5px 9px;
+  font-size:11px;
+  display:flex;
+  gap:5px;
+  align-items:baseline;
+}
+.ll-name{font-weight:700;color:var(--navy);}
+.ll-val{font-weight:600;color:var(--coral-dark);}
+
+/* ---------- Record certified overlay ---------- */
+.cert-overlay{
+  position:absolute;inset:0;
+  background:rgba(10,14,30,0.88);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:50;
+  padding:20px;
+}
+.cert-overlay.active{display:flex;}
+.cert-card{
+  background:linear-gradient(160deg, #fffaf0, #fff2d6);
+  border-radius:20px;
+  padding:30px 24px;
+  text-align:center;
+  max-width:340px;
+  box-shadow:0 0 0 6px var(--gold), 0 20px 40px rgba(0,0,0,0.4);
+  animation:certPop 0.4s ease;
+}
+@keyframes certPop{
+  0%{transform:scale(0.6);opacity:0;}
+  70%{transform:scale(1.05);}
+  100%{transform:scale(1);opacity:1;}
+}
+.cert-emoji{font-size:54px;}
+.cert-heading{color:var(--gold-dark);font-weight:800;font-size:14px;letter-spacing:1px;text-transform:uppercase;margin-top:6px;}
+.cert-name{color:var(--navy);font-weight:800;font-size:19px;margin-top:6px;line-height:1.3;}
+.cert-fact{color:#555;font-size:13px;margin-top:8px;line-height:1.4;}
+.cert-divider{height:1px;background:#e5ddc8;margin:14px 0 10px;}
+.cert-practice-label{color:#999;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;}
+.cert-value{color:var(--coral-dark);font-weight:800;font-size:20px;margin-top:6px;}
+
+/* ---------- Booth complete overlay ---------- */
+.complete-card{
+  background:linear-gradient(160deg, var(--navy-light), var(--navy));
+  border-radius:22px;
+  padding:34px 24px;
+  text-align:center;
+  max-width:340px;
+  box-shadow:0 0 0 4px var(--gold);
+}
+.complete-emoji{font-size:60px;}
+.complete-title{color:var(--gold);font-weight:800;font-size:22px;margin-top:8px;}
+.complete-sub{color:var(--cream);opacity:0.85;font-size:14px;margin-top:8px;}
+.complete-stars{display:flex;gap:6px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.complete-stamp{width:28px;height:28px;font-size:15px;}
+
+/* ---------- Record Book ---------- */
+#screen-book .screen-inner{padding-top:4px;}
+.book-header{width:100%;display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.book-back{
+  background:var(--navy-light);color:var(--cream);border-radius:10px;
+  width:38px;height:38px;font-size:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.book-title{color:var(--gold);font-size:20px;font-weight:800;}
+.book-empty{color:var(--cream);opacity:0.7;text-align:center;margin-top:60px;font-size:14px;line-height:1.6;}
+.book-section-title{color:var(--cream);font-weight:700;font-size:14px;margin:14px 0 8px;width:100%;opacity:0.9;}
+.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.book-item{
+  background:var(--cream);
+  border-radius:14px;
+  padding:12px 8px;
+  text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,0.2);
+}
+.book-item-emoji{font-size:26px;}
+.book-item-name{font-size:11px;font-weight:700;color:var(--navy);margin-top:4px;line-height:1.25;}
+.book-item-value{font-size:12px;font-weight:800;color:var(--coral-dark);margin-top:3px;}
+
+/* ---------- Finale ---------- */
+#screen-finale .screen-inner{justify-content:center;height:100%;text-align:center;gap:16px;}
+.finale-emoji{font-size:70px;}
+.finale-title{font-size:26px;font-weight:800;color:var(--gold);}
+.finale-sub{color:var(--cream);opacity:0.85;font-size:15px;max-width:320px;line-height:1.5;}
+.finale-count{color:var(--coral);font-weight:800;font-size:20px;}
+
+/* confetti */
+.confetti-piece{
+  position:absolute;
+  top:-20px;
+  width:8px;height:14px;
+  opacity:0.9;
+  border-radius:2px;
+  animation:confettiFall linear forwards;
+}
+@keyframes confettiFall{
+  to{transform:translateY(110vh) rotate(360deg);opacity:0.3;}
+}
+
+.mascot-wrap svg{display:block;width:100%;height:100%;}
+.mascot-title{width:clamp(120px, 13vw, 190px);height:calc(1.3158 * clamp(120px, 13vw, 190px));margin:0 auto;}
+.mascot-hub{width:clamp(56px, 6vw, 84px);height:calc(1.3214 * clamp(56px, 6vw, 84px));flex-shrink:0;}
+.hub-mascot-row{display:flex;align-items:center;gap:10px;}
+.hub-title-block{display:flex;flex-direction:column;gap:2px;}
+.hub-rank{font-size:clamp(11px, 1.2vw, 15px);color:var(--gold);font-weight:700;opacity:0.9;}
+.mascot-play{width:clamp(130px, 15vw, 210px);height:calc(1.3154 * clamp(130px, 15vw, 210px));flex-shrink:0;}
+.mascot-play svg{width:100%;height:100%;}
+.mascot-cert{width:clamp(90px, 10vw, 140px);height:calc(1.3111 * clamp(90px, 10vw, 140px));margin:0 auto 6px;}
+.mascot-complete{width:clamp(100px, 11vw, 155px);height:calc(1.32 * clamp(100px, 11vw, 155px));margin:0 auto 6px;}
+
+::-webkit-scrollbar{width:0;height:0;}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- TITLE -->
+  <div class="screen active" id="screen-title">
+    <div class="screen-inner">
+      <div class="mascot-wrap mascot-title" id="mascot-title"></div>
+      <div class="title-name">Record Breakers</div>
+      <div class="title-sub">Join the World Record Expo as a rookie record scout — verify wild measurements and build your very own Record Book!</div>
+      <div class="title-buttons">
+        <button class="btn" id="btn-new-game">New Game</button>
+        <button class="btn secondary" id="btn-continue" style="display:none;">Continue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TUTORIAL -->
+  <div class="screen" id="screen-tutorial">
+    <div class="screen-inner">
+      <div class="tut-card" id="tut-card-content">
+        <!-- filled by JS -->
+      </div>
+      <div class="tut-nav">
+        <button class="btn secondary" id="tut-skip" style="padding:10px 16px;font-size:13px;">Skip Intro</button>
+        <div class="tut-dots" id="tut-dots"></div>
+        <button class="btn" id="tut-next" style="padding:10px 20px;font-size:14px;">Next</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HUB -->
+  <div class="screen" id="screen-hub">
+    <div class="screen-inner">
+      <div class="hub-header">
+        <div class="hub-mascot-row">
+          <div class="mascot-wrap mascot-hub" id="mascot-hub"></div>
+          <div class="hub-title-block">
+            <div class="hub-title">🎪 Record Expo</div>
+            <div class="hub-rank" id="hub-rank"></div>
+          </div>
+        </div>
+        <button class="hub-book-btn" id="btn-open-book">📖 My Record Book</button>
+      </div>
+      <div class="booth-grid" id="booth-grid"></div>
+    </div>
+  </div>
+
+  <!-- BOOTH INTRO -->
+  <div class="screen" id="screen-booth-intro">
+    <div class="screen-inner">
+      <div class="booth-intro-card" id="booth-intro-card"></div>
+      <div class="title-buttons" style="margin-top:22px;">
+        <button class="btn" id="btn-start-booth">Enter Booth</button>
+        <button class="btn secondary" id="btn-back-hub-1">Back to Expo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAY -->
+  <div class="screen" id="screen-play">
+    <div class="screen-inner">
+      <div class="play-topbar">
+        <button class="play-exit" id="btn-exit-play">✕</button>
+        <div class="play-progressbar"><div class="play-progressfill" id="play-progressfill"></div></div>
+      </div>
+      <div class="record-badge" id="play-context-badge"></div>
+      <div class="play-main-row">
+        <div class="mascot-wrap mascot-play" id="mascot-play"></div>
+        <div class="question-card" id="question-card"></div>
+      </div>
+      <div class="feedback-banner" id="feedback-banner"></div>
+      <div class="submit-row">
+        <button class="btn coral" id="btn-submit-answer">Check Answer</button>
+        <button class="btn" id="btn-next-question" style="display:none;">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORD BOOK -->
+  <div class="screen" id="screen-book">
+    <div class="screen-inner">
+      <div class="book-header">
+        <button class="book-back" id="btn-book-back">←</button>
+        <div class="book-title">📖 My Record Book</div>
+      </div>
+      <div id="book-content"></div>
+    </div>
+  </div>
+
+  <!-- FINALE -->
+  <div class="screen" id="screen-finale">
+    <div class="screen-inner">
+      <div class="finale-emoji">🏅🎉</div>
+      <div class="finale-title">Master Record Scout!</div>
+      <div class="finale-sub">You've certified every record at the Expo and filled your Record Book with <span class="finale-count" id="finale-count">0</span> world records!</div>
+      <div class="title-buttons">
+        <button class="btn" id="btn-view-book-finale">View Record Book</button>
+        <button class="btn secondary" id="btn-replay">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERT OVERLAY -->
+  <div class="cert-overlay" id="cert-overlay">
+    <div class="cert-card" id="cert-card"></div>
+  </div>
+
+  <!-- BOOTH COMPLETE OVERLAY -->
+  <div class="cert-overlay" id="complete-overlay">
+    <div class="complete-card" id="complete-card"></div>
+  </div>
+
+  <!-- SYMBOL PICKER POPUP (compare questions) -->
+  <div class="symbol-picker-overlay" id="symbol-picker-overlay">
+    <div class="symbol-picker-card">
+      <div class="symbol-picker-title">Which symbol fits?</div>
+      <div class="symbol-picker-buttons">
+        <button class="symbol-picker-btn" data-choice="less">&lt;</button>
+        <button class="symbol-picker-btn" data-choice="equal">=</button>
+        <button class="symbol-picker-btn" data-choice="greater">&gt;</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+// ============================================================
+// FRACTION MATH UTILITIES
+// ============================================================
+function gcd(a, b) {
+  a = Math.abs(Math.round(a)); b = Math.abs(Math.round(b));
+  while (b) { [a, b] = [b, a % b]; }
+  return a || 1;
+}
+function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+function simplify(n, d) {
+  if (d < 0) { n = -n; d = -d; }
+  const g = gcd(n, d);
+  return [n / g, d / g];
+}
+// mixed {w,n,d} -> improper fraction {n,d}
+function toImproper(w, n, d) { return [w * d + n, d]; }
+// improper n/d -> mixed {w,n,d} (n,d stay as given, not simplified)
+function toMixedRaw(n, d) {
+  const w = Math.floor(n / d);
+  const rem = n - w * d;
+  return [w, rem, d];
+}
+function fracValue(n, d) { return n / d; }
+function mixedValue(w, n, d) { return w + n / d; }
+// compare two fractions n1/d1 vs n2/d2 -> -1,0,1
+function compareFrac(n1, d1, n2, d2) {
+  const left = n1 * d2, right = n2 * d1;
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
+}
+function addFrac(n1, d1, n2, d2) {
+  const L = lcm(d1, d2);
+  const n = n1 * (L / d1) + n2 * (L / d2);
+  return simplify(n, L);
+}
+function subFrac(n1, d1, n2, d2) {
+  const L = lcm(d1, d2);
+  const n = n1 * (L / d1) - n2 * (L / d2);
+  return simplify(n, L);
+}
+function mulFracWhole(n, d, w) { return simplify(n * w, d); }
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[randInt(0, arr.length - 1)]; }
+
+// Shuffle-bag picker for REAL_RECORDS so the same record doesn't repeat
+// until every record in the pool has been used once.
+let _recordBag = [];
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = randInt(0, i);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function pickRecord() {
+  if (_recordBag.length === 0) {
+    _recordBag = shuffleArray(REAL_RECORDS);
+  }
+  return _recordBag.pop();
+}
+
+// format a fraction/mixed value into plain text (for context strings), e.g. "2 3/5" or "3/5"
+function formatMixedText(w, n, d) {
+  if (n === 0) return `${w}`;
+  if (w === 0) return `${n}/${d}`;
+  return `${w} ${n}/${d}`;
+}
+function formatImproperText(n, d) { return `${n}/${d}`; }
+// simplify an n/d fraction and format as a mixed number for display of computed results
+function exactMixedDisplay(n, d) {
+  const [sn, sd] = simplify(n, d);
+  const [w, rn, rd] = toMixedRaw(sn, sd);
+  return formatMixedText(w, rn, rd);
+}
+
+// check if a user-entered mixed number {w,n,d} is mathematically equivalent to a target value
+function valuesEqual(v1, v2, tol = 1e-9) { return Math.abs(v1 - v2) < tol; }
+
+// ============================================================
+// REAL, VERIFIED WORLD RECORDS (Guinness World Records, checked July 2026)
+// The record NAME and FACT are real. The measurement used in each math
+// problem is separately generated to fit the skill being practiced —
+// the game is always explicit that the fraction shown is a "practice
+// number," not the actual record measurement.
+// country/pin fields support the Record Book world map.
+// ============================================================
+const REAL_RECORDS = [
+  { name: 'Tallest Sandcastle', thing: 'the tallest sandcastle', emoji: '🏰', unit: 'feet', country: 'Denmark', pin: { x: 190, y: 50 },
+    fact: 'The real record is 69 feet 5 inches tall — built in Denmark in 2021 using about 6,400 tons of sand.' },
+  { name: 'Farthest Paper Airplane Flight', thing: 'the farthest paper airplane flight', emoji: '✈️', unit: 'feet', country: 'China', pin: { x: 282, y: 62 },
+    fact: "The real record is 322 feet 11 inches — thrown by Liu Liwen's team in China in 2025." },
+  { name: 'Largest Bubblegum Bubble', thing: 'the largest bubblegum bubble', emoji: '🫧', unit: 'inches', country: 'USA', pin: { x: 78, y: 66 },
+    fact: 'The real record is 20 inches wide — blown hands-free by Chad Fell in Alabama in 2004.' },
+  { name: 'Tallest Snowman', thing: 'the tallest snowman', emoji: '⛄', unit: 'feet', country: 'USA', pin: { x: 95, y: 55 },
+    fact: 'The real record is 122 feet 1 inch tall — a snow-woman named Olympia, built in Maine in 2008 from 13 million pounds of snow.' },
+  { name: 'Tallest LEGO Tower', thing: 'the tallest LEGO tower', emoji: '🧱', unit: 'feet', country: 'Italy', pin: { x: 198, y: 57 },
+    fact: 'The real record is 114 feet 11 inches tall — built in Milan, Italy in 2015 from about 550,000 LEGO bricks.' },
+  { name: 'Longest Fingernails (One Hand)', thing: 'the longest fingernails on one hand', emoji: '💅', unit: 'inches', country: 'India', pin: { x: 252, y: 78 },
+    fact: 'The real record is 358.1 inches combined — grown by Shridhar Chillal in India over 66 years.' },
+  { name: 'Longest Pizza', thing: 'the longest pizza', emoji: '🍕', unit: 'feet', country: 'USA', pin: { x: 58, y: 70 },
+    fact: 'The real record is 6,333 feet long — made by a team of chefs in Fontana, California.' },
+  { name: 'Highest Kite Flight', thing: 'the highest kite flight', emoji: '🪁', unit: 'feet', country: 'Australia', pin: { x: 312, y: 148 },
+    fact: "The real record is 16,009 feet high — flown by Robert Moore's team in Australia in 2014." },
+  { name: 'Tallest Tower of Cupcakes', thing: 'the tallest tower of cupcakes', emoji: '🧁', unit: 'feet', country: 'India', pin: { x: 248, y: 80 },
+    fact: 'The real record is 41 feet 8 inches tall — built from 18,818 cupcakes in Chennai, India in 2019.' },
+  { name: 'Longest Paperclip Chain', thing: 'the longest paperclip chain', emoji: '🖇️', unit: 'feet', country: 'Bangladesh', pin: { x: 262, y: 80 },
+    fact: 'The real record is 8,290 feet long — linked by one person, Imran Sharif, in Bangladesh in 2019.' },
+  { name: 'Longest Sandwich', thing: 'the longest sandwich', emoji: '🥪', unit: 'feet', country: 'Lebanon', pin: { x: 216, y: 68 },
+    fact: 'The real record is 2,411 feet long — made by three teams working together in Lebanon in 2011.' },
+  { name: 'Longest Crochet Scarf', thing: 'the longest crochet scarf', emoji: '🧣', unit: 'feet', country: 'USA', pin: { x: 62, y: 68 },
+    fact: 'The real record is 981 feet long — crocheted by one person, Daisy Ptak, in California in 2024.' },
+  { name: 'Longest Hopscotch Game', thing: 'the longest hopscotch game', emoji: '🦘', unit: 'feet', country: 'USA', pin: { x: 82, y: 60 },
+    fact: 'The real record is 23,088 feet long (4.37 miles!) — painted by volunteers in Colorado in 2022.' },
+  { name: 'Tallest Stack of Pancakes', thing: 'the tallest stack of pancakes', emoji: '🥞', unit: 'feet', country: 'Australia', pin: { x: 310, y: 152 },
+    fact: 'The real record is about 3 feet 7 inches tall (230 pancakes!) — stacked in Sydney, Australia in 2025.' },
+  { name: 'Longest Line of Pancakes', thing: 'the longest line of pancakes', emoji: '🥞', unit: 'feet', country: 'UK', pin: { x: 182, y: 44 },
+    fact: 'The real record is 429 feet 3 inches long — laid out at a stadium in London in 2020.' },
+  { name: 'Tallest Sunflower', thing: 'the tallest sunflower', emoji: '🌻', unit: 'feet', country: 'USA', pin: { x: 90, y: 58 },
+    fact: 'The real record is 35 feet 9 inches tall — grown by Alex Babich in Indiana in 2025.' },
+  { name: 'Longest Hair', thing: 'the longest hair on a living person', emoji: '💇', unit: 'feet', country: 'Ukraine', pin: { x: 216, y: 44 },
+    fact: "The real record is 8 feet 5 inches long — grown by Aliia Nasyrova, whose hair is longer than the world's tallest man." },
+  { name: 'Largest Gingerbread House', thing: 'the largest gingerbread house', emoji: '🍪', unit: 'feet', country: 'USA', pin: { x: 84, y: 74 },
+    fact: 'The real record is 60 feet long — built in Texas in 2013 with an internal volume of over 39,000 cubic feet.' },
+  { name: "World's Longest Cake", thing: "the world's longest cake", emoji: '🎂', unit: 'feet', country: 'India', pin: { x: 250, y: 78 },
+    fact: 'The real record is over 3 miles long (more than 15,800 feet!) — baked in Thrissur, India in 2020.' },
+  { name: 'Longest Knitted Scarf', thing: 'the longest knitted scarf', emoji: '🧣', unit: 'feet', country: 'Norway', pin: { x: 196, y: 36 },
+    fact: 'The real record is 14,978 feet long — knitted by one person, Helge Johansen, in Norway over several years.' },
+  { name: 'Longest Ice Cream Dessert', thing: 'the longest ice cream dessert', emoji: '🍨', unit: 'feet', country: 'USA', pin: { x: 88, y: 72 },
+    fact: 'The real record is 4,549 feet long — made with 500 gallons of ice cream at a festival in Texas in 2018.' },
+  { name: 'Longest Dreadlocks', thing: 'the longest dreadlocks', emoji: '💇', unit: 'feet', country: 'USA', pin: { x: 92, y: 68 },
+    fact: "The real record is 19 feet 6 inches long, grown by Asha Mandela, nicknamed 'Black Rapunzel.'" },
+  { name: 'Tallest Stack of Books', thing: 'the tallest stack of books', emoji: '📚', unit: 'feet', country: 'UK', pin: { x: 180, y: 46 },
+    fact: 'The real record is 19 feet 8 inches tall — stacked by Russell Books.' },
+  { name: 'Tallest Rideable Unicycle', thing: 'the tallest rideable unicycle', emoji: '🚲', unit: 'feet', country: 'USA', pin: { x: 90, y: 56 },
+    fact: 'The real record is 43 feet 11.75 inches tall — ridden by Jamey Mossengren in Minnesota in 2024.' },
+  { name: 'Longest Water Slide', thing: 'the longest water slide', emoji: '💦', unit: 'feet', country: 'Malaysia', pin: { x: 275, y: 100 },
+    fact: 'The real record is 3,645 feet long, winding through the jungle at a theme park in Malaysia.' },
+  { name: 'Longest Paper Strip Cut', thing: 'the longest continuous paper strip cut', emoji: '✂️', unit: 'feet', country: 'China', pin: { x: 285, y: 60 },
+    fact: 'The real record is 354 feet long — cut from a single sheet of paper by Pei Haozheng.' },
+  { name: 'Tallest Rideable Bicycle', thing: 'the tallest rideable bicycle', emoji: '🚴', unit: 'feet', country: 'France', pin: { x: 188, y: 48 },
+    fact: "The real record is 25 feet 5 inches tall — built and ridden as the 'Starbike' in France." },
+  { name: 'Tallest Topiary Sculpture', thing: 'the tallest topiary sculpture', emoji: '🌳', unit: 'feet', country: 'UAE', pin: { x: 232, y: 74 },
+    fact: 'The real record is 59 feet 3 inches tall — grown from nearly 100,000 flowers at a garden in Dubai.' },
+  { name: 'Tallest Bloom', thing: 'the tallest flower bloom', emoji: '🌸', unit: 'feet', country: 'USA', pin: { x: 86, y: 62 },
+    fact: 'The real record is 10 feet 2 inches tall — a Titan Arum grown by Louis Ricciardiello in the USA.' },
+  { name: 'Longest Carpet of Flowers', thing: 'the longest carpet of flowers', emoji: '🌼', unit: 'feet', country: 'China', pin: { x: 278, y: 68 },
+    fact: 'The real record is 6,597 feet long — made from over 22,000 potted chrysanthemums in China.' },
+  { name: 'Largest Inflatable Sculpture', thing: 'the largest inflatable sculpture', emoji: '🎈', unit: 'feet', country: 'China', pin: { x: 282, y: 70 },
+    fact: 'The real record is 161 feet long — a giant fashion sculpture inflated in Guangzhou, China in 2022.' },
+  { name: 'Largest Snow Sculpture', thing: 'the largest snow sculpture', emoji: '❄️', unit: 'feet', country: 'China', pin: { x: 288, y: 45 },
+    fact: "The real record is 656 feet long and 115 feet tall — carved at China's Harbin snow festival." },
+  { name: 'Longest Crochet Chain', thing: 'the longest crochet chain', emoji: '🧶', unit: 'feet', country: 'France', pin: { x: 190, y: 50 },
+    fact: 'The real record is over 426,000 feet long (80.78 miles!) — crocheted by one person in France over five months.' },
+  { name: 'Longest Garland Wand', thing: 'the longest garland wand', emoji: '✨', unit: 'feet', country: 'Taiwan', pin: { x: 290, y: 82 },
+    fact: 'The real record is 52 feet 8 inches long — crafted by a father and his seven-year-old son in Taiwan.' },
+];
+
+// ============================================================
+// CATEGORY DEFINITIONS
+// ============================================================
+const CATEGORIES = [
+  {
+    id: 'compare',
+    icon: '📏',
+    name: 'Longest & Shortest',
+    desc: 'Compare fraction and mixed-number measurements with <, >, or =.',
+    introText: "Judges recorded two measurements for the same record — but wrote them as different fractions! Figure out which one is really bigger (or if they're tied).",
+    tiers: 6,
+  },
+  {
+    id: 'convert',
+    icon: '🔄',
+    name: 'Odd Measurements',
+    desc: 'Convert between improper fractions and mixed numbers.',
+    introText: "Record judges love writing measurements as awkward fractions. Convert them into the form the Record Book needs before they can be certified!",
+    tiers: 6,
+  },
+  {
+    id: 'estimate',
+    icon: '🎯',
+    name: 'Ballpark Records',
+    desc: 'Estimate sums and differences by rounding.',
+    introText: "Sometimes a record scout just needs a quick ballpark number. Round each measurement and estimate the total or difference!",
+    tiers: 6,
+  },
+  {
+    id: 'addsub',
+    icon: '➕',
+    name: 'Record Gaps',
+    desc: 'Add and subtract fractions and mixed numbers exactly.',
+    introText: "How much did one record beat another by? Find the exact gap between two measurements — or fill in a missing one!",
+    tiers: 6,
+  },
+  {
+    id: 'multiply',
+    icon: '✖️',
+    name: 'Supersized Records',
+    desc: 'Multiply a fraction or mixed number by a whole number.',
+    introText: "What if a record got scaled way up? Multiply the measurement by a whole number to find the new supersized record!",
+    tiers: 6,
+  },
+  {
+    id: 'lineplot',
+    icon: '📊',
+    name: 'Record Data',
+    desc: 'Read a line plot of record attempts and compare results.',
+    introText: "A whole crowd of record attempts got plotted on a line plot. Read the data carefully to answer the judges' questions!",
+    tiers: 5,
+  },
+];
+
+// ============================================================
+// GENERATORS — each returns a question object.
+// ============================================================
+
+function randDen(min, max) { let d = randInt(min, max); return d === 1 ? d + 1 : d; }
+
+// ---------- COMPARE ----------
+function genCompare(tier) {
+  const flavor = pickRecord();
+  let w1, n1, d1, w2, n2, d2, mode = 'mixed';
+  if (tier === 1) {
+    d1 = d2 = randDen(3, 8); w1 = w2 = randInt(1, 5);
+    n1 = randInt(0, d1 - 1); n2 = randInt(0, d1 - 1);
+    while (n1 === n2) n2 = randInt(0, d1 - 1);
+  } else if (tier === 2) {
+    w1 = w2 = randInt(1, 6);
+    d1 = pick([2, 3, 4]); d2 = pick([2, 4, 5, 8]);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+  } else if (tier === 3) {
+    w1 = randInt(1, 6); w2 = randInt(1, 6);
+    d1 = randDen(3, 6); d2 = randDen(3, 8);
+    n1 = randInt(0, d1 - 1); n2 = randInt(0, d2 - 1);
+  } else if (tier === 4) {
+    mode = 'improper';
+    d1 = randDen(4, 9); d2 = randDen(4, 9);
+    n1 = randInt(d1 + 1, d1 * 4); n2 = randInt(d2 + 1, d2 * 4);
+  } else if (tier === 5) {
+    w1 = w2 = randInt(3, 9);
+    d1 = randDen(6, 10); d2 = randDen(6, 12);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+  } else {
+    w1 = w2 = randInt(1, 7);
+    if (Math.random() < 0.5) {
+      const baseD = randDen(3, 6), baseN = randInt(1, baseD - 1);
+      const mult1 = pick([2, 3]), mult2 = pick([2, 3, 4]);
+      n1 = baseN * mult1; d1 = baseD * mult1;
+      n2 = baseN * mult2; d2 = baseD * mult2;
+    } else {
+      d1 = randDen(4, 9); d2 = randDen(4, 9);
+      n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+    }
+  }
+  let val1, val2, disp1, disp2;
+  if (mode === 'improper') {
+    val1 = fracValue(n1, d1); val2 = fracValue(n2, d2);
+    disp1 = { w: 0, n: n1, d: d1 }; disp2 = { w: 0, n: n2, d: d2 };
+  } else {
+    val1 = mixedValue(w1, n1, d1); val2 = mixedValue(w2, n2, d2);
+    disp1 = { w: w1, n: n1, d: d1 }; disp2 = { w: w2, n: n2, d: d2 };
+  }
+  let correct = 'equal';
+  if (val1 < val2) correct = 'less';
+  else if (val1 > val2) correct = 'greater';
+  const relationWord = correct === 'less' ? 'is shorter than' : correct === 'greater' ? 'is longer than' : 'equals';
+  return {
+    type: 'compare', tier,
+    context: `Two scouts measured ${flavor.thing} in ${flavor.unit}.`,
+    left: disp1, right: disp2, correct, flavor,
+    recordValue: `${formatDisplayFraction(disp1)} ${flavor.unit} ${relationWord} ${formatDisplayFraction(disp2)} ${flavor.unit}`,
+  };
+}
+function formatDisplayFraction(f) {
+  if (f.n === 0) return `${f.w}`;
+  if (f.w === 0) return `${f.n}/${f.d}`;
+  return `${f.w} ${f.n}/${f.d}`;
+}
+
+// ---------- CONVERT ----------
+function genConvert(tier) {
+  const flavor = pickRecord();
+  const toMixed = tier % 2 === 1;
+  let n, d, w;
+  if (tier <= 2) { d = randDen(3, 5); n = randInt(d + 1, d * 3); }
+  else if (tier <= 4) { d = randDen(4, 9); n = randInt(d + 1, d * 3); }
+  else { d = randDen(5, 12); n = randInt(d + 1, d * 4); }
+
+  if (toMixed) {
+    const [rw, rn, rd] = toMixedRaw(n, d);
+    return {
+      type: 'convert-to-mixed', tier,
+      context: `A judge wrote down ${flavor.thing} as an improper fraction.`,
+      given: { n, d }, correctValue: mixedValue(rw, rn, rd), flavor,
+      recordValue: `${n}/${d} ${flavor.unit} = ${formatMixedText(rw, rn, rd)} ${flavor.unit}`,
+    };
+  } else {
+    w = randInt(1, 9);
+    const fracN = randInt(1, d - 1);
+    const [impN, impD] = toImproper(w, fracN, d);
+    return {
+      type: 'convert-to-improper', tier,
+      context: `A judge wrote down ${flavor.thing} as a mixed number.`,
+      given: { w, n: fracN, d }, correctValue: mixedValue(w, fracN, d), flavor,
+      recordValue: `${formatMixedText(w, fracN, d)} ${flavor.unit} = ${impN}/${impD} ${flavor.unit}`,
+    };
+  }
+}
+
+// ---------- ESTIMATE ----------
+function genEstimate(tier) {
+  const flavor = pickRecord();
+  const op = tier % 2 === 1 ? 'add' : 'subtract';
+  let w1, n1, d1, w2, n2, d2;
+  const sizeRange = tier <= 2 ? [2, 6] : tier <= 4 ? [3, 12] : [5, 20];
+  w1 = randInt(sizeRange[0], sizeRange[1]);
+  w2 = randInt(sizeRange[0], sizeRange[1]);
+  d1 = randDen(4, 10); d2 = randDen(4, 12);
+  n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+  if (op === 'subtract' && w1 < w2) { [w1, w2] = [w2, w1]; }
+
+  const round1 = Math.round(mixedValue(w1, n1, d1));
+  const round2 = Math.round(mixedValue(w2, n2, d2));
+  const estimate = op === 'add' ? round1 + round2 : round1 - round2;
+  return {
+    type: 'estimate', tier,
+    context: `Estimate to help judge ${flavor.thing} quickly.`,
+    left: { w: w1, n: n1, d: d1 }, right: { w: w2, n: n2, d: d2 }, op,
+    correctValue: estimate, tolerance: 1, flavor,
+    recordValue: `about ${estimate} ${flavor.unit}`,
+  };
+}
+
+// ---------- ADD/SUB ----------
+function genAddSub(tier) {
+  const flavor = pickRecord();
+  let w1, n1, d1, w2, n2, d2, op, missing = false;
+  if (tier === 1) {
+    d1 = d2 = randDen(3, 8); w1 = randInt(1, 6); w2 = randInt(0, 3);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d1 - 1);
+    op = 'add';
+  } else if (tier === 2) {
+    d1 = d2 = randDen(4, 9); w1 = randInt(4, 10); w2 = randInt(1, 5);
+    n1 = randInt(0, d1 - 1); n2 = randInt(0, d1 - 1);
+    if (mixedValue(w1, n1, d1) < mixedValue(w2, n2, d2)) { [w1, w2] = [w2, w1]; [n1, n2] = [n2, n1]; }
+    op = 'subtract';
+  } else if (tier === 3) {
+    d1 = randDen(3, 8); w1 = randInt(1, 6); n1 = randInt(1, d1 - 1);
+    const targetW = w1 + randInt(1, 4);
+    w2 = targetW; n2 = 0; d2 = d1;
+    op = 'missing-add'; missing = true;
+  } else if (tier === 4) {
+    d1 = randDen(4, 8); d2 = randDen(4, 8);
+    while (d2 === d1) d2 = randDen(4, 8);
+    w1 = randInt(6, 12); w2 = randInt(1, 5);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+    if (mixedValue(w1, n1, d1) < mixedValue(w2, n2, d2)) { [w1, n1, d1, w2, n2, d2] = [w2, n2, d2, w1, n1, d1]; }
+    op = 'subtract';
+  } else if (tier === 5) {
+    d1 = randDen(4, 8); d2 = randDen(4, 8);
+    while (d2 === d1) d2 = randDen(4, 8);
+    w1 = randInt(1, 8); w2 = randInt(1, 8);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+    op = 'add';
+  } else {
+    d1 = randDen(5, 10); d2 = randDen(5, 10);
+    while (d2 === d1) d2 = randDen(5, 10);
+    w1 = randInt(9, 15); w2 = randInt(1, 7);
+    n1 = randInt(1, d1 - 1); n2 = randInt(1, d2 - 1);
+    if (mixedValue(w1, n1, d1) < mixedValue(w2, n2, d2)) { [w1, n1, d1, w2, n2, d2] = [w2, n2, d2, w1, n1, d1]; }
+    op = 'subtract';
+  }
+
+  let correctValue;
+  let resultFrac;
+  if (op === 'add') {
+    correctValue = mixedValue(w1, n1, d1) + mixedValue(w2, n2, d2);
+    resultFrac = addFrac(w1 * d1 + n1, d1, w2 * d2 + n2, d2);
+  } else if (op === 'subtract') {
+    correctValue = mixedValue(w1, n1, d1) - mixedValue(w2, n2, d2);
+    resultFrac = subFrac(w1 * d1 + n1, d1, w2 * d2 + n2, d2);
+  } else if (op === 'missing-add') {
+    correctValue = mixedValue(w2, n2, d2) - mixedValue(w1, n1, d1);
+    resultFrac = subFrac(w2 * d2 + n2, d2, w1 * d1 + n1, d1);
+  }
+  const resultDisplay = exactMixedDisplay(resultFrac[0], resultFrac[1]);
+
+  return {
+    type: 'addsub', tier,
+    context: missing
+      ? `A scout needs to find how much more is needed to hit the next milestone for ${flavor.thing}.`
+      : op === 'add'
+        ? `Two attempts at ${flavor.thing} were combined for a team record.`
+        : `Find the exact gap between two attempts at ${flavor.thing}.`,
+    left: { w: w1, n: n1, d: d1 }, right: { w: w2, n: n2, d: d2 }, op, correctValue, flavor,
+    recordValue: missing
+      ? `${formatMixedText(w1, n1, d1)} + ${resultDisplay} = ${formatMixedText(w2, n2, d2)} ${flavor.unit}`
+      : `${formatMixedText(w1, n1, d1)} ${op === 'add' ? '+' : '−'} ${formatMixedText(w2, n2, d2)} = ${resultDisplay} ${flavor.unit}`,
+  };
+}
+
+// ---------- MULTIPLY ----------
+function genMultiply(tier) {
+  const flavor = pickRecord();
+  let w, n, d, whole;
+  if (tier === 1) { d = pick([3, 4, 5, 6]); n = randInt(1, d - 1); whole = randInt(2, 6); w = 0; }
+  else if (tier === 2) { d = pick([4, 5, 6, 8]); n = randInt(1, d - 1); whole = randInt(4, 11); w = 0; }
+  else if (tier === 3) { d = pick([3, 4, 5]); n = randInt(1, d - 1); w = randInt(1, 5); whole = randInt(2, 4); }
+  else if (tier === 4) { d = pick([4, 6, 8, 10]); n = randInt(1, d - 1); w = randInt(2, 8); whole = randInt(2, 5); }
+  else if (tier === 5) { d = pick([5, 8, 10, 12]); n = randInt(1, d - 1); w = randInt(3, 12); whole = randInt(3, 6); }
+  else { d = pick([6, 8, 9, 10]); n = randInt(1, d - 1); w = randInt(4, 15); whole = randInt(2, 4); }
+  const baseVal = w + n / d;
+  const correctValue = baseVal * whole;
+  const resultFrac = mulFracWhole(w * d + n, d, whole);
+  const resultDisplay = exactMixedDisplay(resultFrac[0], resultFrac[1]);
+  return {
+    type: 'multiply', tier,
+    context: `A record gets verified, then scaled up by a factor of ${whole} for the "Supersized" category.`,
+    left: { w, n, d }, whole, correctValue, flavor,
+    recordValue: `${formatMixedText(w, n, d)} × ${whole} = ${resultDisplay} ${flavor.unit}`,
+  };
+}
+
+// ---------- LINE PLOT ----------
+function genLinePlot(tier) {
+  const flavor = pickRecord();
+  const names = ['Ari', 'Jules', 'Sam', 'Nia', 'Theo', 'Priya', 'Diego', 'Mo'];
+  const shuffledNames = [...names].sort(() => Math.random() - 0.5);
+  const count = tier <= 2 ? 5 : 7;
+  const denom = pick([4, 8]);
+  const baseWhole = randInt(1, 4);
+  const data = [];
+  const usedVals = new Set();
+  for (let i = 0; i < count; i++) {
+    let w, n, key;
+    do {
+      w = baseWhole + randInt(0, 2);
+      n = randInt(0, denom - 1);
+      key = w + '/' + n;
+    } while (usedVals.has(key));
+    usedVals.add(key);
+    data.push({ name: shuffledNames[i], w, n, d: denom, value: w + n / denom });
+  }
+  data.sort((a, b) => a.value - b.value);
+  const shortest = data[0], longest = data[data.length - 1];
+  const questionKinds = ['difference', 'compare-two', 'who-more'];
+  const kind = pick(questionKinds);
+  if (kind === 'compare-two') {
+    const [p1, p2] = pick2Distinct(data);
+    const correctRel = p1.value < p2.value ? 'less' : p1.value > p2.value ? 'greater' : 'equal';
+    const relWord = correctRel === 'less' ? 'is shorter than' : correctRel === 'greater' ? 'is longer than' : 'equals';
+    return {
+      type: 'lineplot-compare', tier, data, flavor,
+      context: `A line plot shows several attempts at ${flavor.thing}.`,
+      question: `Compare ${p1.name} and ${p2.name}'s attempts using >, <, or =.`,
+      left: p1, right: p2,
+      correct: correctRel,
+      recordValue: `${p1.name}'s ${formatMixedText(p1.w, p1.n, p1.d)} ${flavor.unit} ${relWord} ${p2.name}'s ${formatMixedText(p2.w, p2.n, p2.d)} ${flavor.unit}`,
+    };
+  } else if (kind === 'who-more' && data.length >= 3) {
+    const mid = data[randInt(1, data.length - 2)];
+    const diffFrac = subFrac(longest.w * longest.d + longest.n, longest.d, mid.w * mid.d + mid.n, mid.d);
+    return {
+      type: 'lineplot-value', tier, data, flavor,
+      context: `A line plot shows several attempts at ${flavor.thing}.`,
+      question: `How much farther did ${longest.name} go than ${mid.name}, in ${flavor.unit}?`,
+      correctValue: longest.value - mid.value,
+      extra: { a: longest, b: mid },
+      recordValue: `${longest.name} (${formatMixedText(longest.w, longest.n, longest.d)}) − ${mid.name} (${formatMixedText(mid.w, mid.n, mid.d)}) = ${exactMixedDisplay(diffFrac[0], diffFrac[1])} ${flavor.unit}`,
+    };
+  } else {
+    const diffFrac = subFrac(longest.w * longest.d + longest.n, longest.d, shortest.w * shortest.d + shortest.n, shortest.d);
+    return {
+      type: 'lineplot-value', tier, data, flavor,
+      context: `A line plot shows several attempts at ${flavor.thing}.`,
+      question: `What is the difference, in ${flavor.unit}, between the longest and shortest attempt?`,
+      correctValue: longest.value - shortest.value,
+      extra: { a: longest, b: shortest },
+      recordValue: `${longest.name} (${formatMixedText(longest.w, longest.n, longest.d)}) − ${shortest.name} (${formatMixedText(shortest.w, shortest.n, shortest.d)}) = ${exactMixedDisplay(diffFrac[0], diffFrac[1])} ${flavor.unit}`,
+    };
+  }
+}
+function pick2Distinct(arr) {
+  const i = randInt(0, arr.length - 1);
+  let j = randInt(0, arr.length - 1);
+  while (j === i) j = randInt(0, arr.length - 1);
+  return [arr[i], arr[j]];
+}
+
+const GENERATORS = {
+  compare: genCompare,
+  convert: genConvert,
+  estimate: genEstimate,
+  addsub: genAddSub,
+  multiply: genMultiply,
+  lineplot: genLinePlot,
+};
+
+</script>
+<script>
+// ============================================================
+// MASCOT SPRITE — original artwork, three poses swapped based on game state
+// ============================================================
+const MASCOT_SVGS = {
+  idle: `<svg viewBox="0 0 380 500" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="190" cy="465" rx="68" ry="13" fill="#000000" opacity="0.13"/>
+<ellipse cx="165" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<ellipse cx="215" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<rect x="147" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="197" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="138" y="325" width="104" height="16" rx="5" fill="#4A3226"/>
+<rect x="180" y="326" width="20" height="14" rx="3" fill="#E3B23C"/>
+<path d="M150 220 Q100 240 100 275 L96 300 Q96 308 104 308 Q112 308 112 300 L118 280 Q122 250 158 232 Z" fill="#6B8F71"/>
+<rect x="66" y="252" width="60" height="80" rx="7" fill="#D8CBB0"/>
+<rect x="72" y="260" width="48" height="64" rx="3" fill="#FFFFFF"/>
+<rect x="78" y="270" width="36" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="78" y="280" width="36" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="78" y="290" width="24" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="86" y="245" width="20" height="10" rx="3" fill="#8A8272"/>
+<line x1="82" y1="304" x2="108" y2="298" stroke="#E3B23C" stroke-width="4" stroke-linecap="round"/>
+<path d="M230 220 Q272 236 266 268 Q264 282 252 280 Q242 278 244 266 Q246 246 220 232 Z" fill="#6B8F71"/>
+<circle cx="260" cy="266" r="15" fill="#F2C299"/>
+<path d="M251 262 L258 258 M263 258 L270 262" stroke="#F2C299" stroke-width="7" stroke-linecap="round"/>
+<rect x="133" y="205" width="114" height="128" rx="20" fill="#6B8F71"/>
+<path d="M178 205 L202 205 L196 222 L184 222 Z" fill="#EAF4FB"/>
+<circle cx="190" cy="255" r="17" fill="#FFF6E5"/>
+<path d="M190 245 L193.5 253 L202 254 L195.5 260 L197.5 268 L190 263.5 L182.5 268 L184.5 260 L178 254 L186.5 253 Z" fill="#6B8F71"/>
+<path d="M186 205 Q190 218 194 205" fill="none" stroke="#C0C0C0" stroke-width="3" stroke-linecap="round"/>
+<circle cx="192" cy="224" r="6" fill="#C0C0C0"/>
+<rect x="178" y="182" width="24" height="28" fill="#F2C299"/>
+<circle cx="190" cy="140" r="50" fill="#F2C299"/>
+<ellipse cx="136" cy="140" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="244" cy="140" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="160" cy="152" rx="10" ry="7" fill="#F4A988" opacity="0.55"/>
+<ellipse cx="220" cy="152" rx="10" ry="7" fill="#F4A988" opacity="0.55"/>
+<circle cx="172" cy="132" r="5.5" fill="#3A2A1E"/>
+<circle cx="208" cy="132" r="5.5" fill="#3A2A1E"/>
+<path d="M162 120 Q172 113 182 119" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M198 119 Q208 113 218 120" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M160 158 Q190 178 220 158" fill="none" stroke="#8A5A34" stroke-width="5" stroke-linecap="round"/>
+<path d="M158 154 Q190 172 222 154 Q190 190 158 154 Z" fill="#FFFFFF"/>
+<ellipse cx="190" cy="98" rx="64" ry="16" fill="#55735C"/>
+<path d="M132 100 Q132 55 190 55 Q248 55 248 100 Q248 108 240 108 L140 108 Q132 108 132 100 Z" fill="#6B8F71"/>
+<circle cx="190" cy="88" r="15" fill="#FFF6E5"/>
+<path d="M190 78 L193.5 86 L202 87 L195.5 93 L197.5 101 L190 96.5 L182.5 101 L184.5 93 L178 87 L186.5 86 Z" fill="#6B8F71"/>
+</svg>`,
+  celebrate: `<svg viewBox="0 0 380 500" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="190" cy="465" rx="68" ry="13" fill="#000000" opacity="0.13"/>
+<ellipse cx="163" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<ellipse cx="217" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<rect x="145" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="199" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="138" y="325" width="104" height="16" rx="5" fill="#4A3226"/>
+<rect x="180" y="326" width="20" height="14" rx="3" fill="#E3B23C"/>
+<path d="M108 148 L104 132 M96 156 L82 148 M104 168 L86 172" stroke="#E3B23C" stroke-width="4" stroke-linecap="round"/>
+<path d="M272 148 L276 132 M284 156 L298 148 M276 168 L294 172" stroke="#E3B23C" stroke-width="4" stroke-linecap="round"/>
+<path d="M155 218 Q112 195 100 150 Q97 138 108 134 Q118 131 121 143 Q130 178 168 200 Z" fill="#6B8F71"/>
+<rect x="76" y="98" width="52" height="70" rx="6" fill="#D8CBB0" transform="rotate(-18 102 133)"/>
+<g transform="rotate(-18 102 133)">
+<rect x="82" y="106" width="40" height="55" rx="3" fill="#FFFFFF"/>
+<rect x="88" y="115" width="28" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="88" y="124" width="28" height="4" rx="2" fill="#B9B2A3"/>
+</g>
+<path d="M225 218 Q268 195 280 150 Q283 138 272 134 Q262 131 259 143 Q250 178 212 200 Z" fill="#6B8F71"/>
+<circle cx="279" cy="132" r="15" fill="#F2C299"/>
+<path d="M271 122 L273 138 M279 118 L279 136 M287 122 L285 138" stroke="#F2C299" stroke-width="5" stroke-linecap="round"/>
+<rect x="133" y="205" width="114" height="128" rx="20" fill="#6B8F71"/>
+<path d="M178 205 L202 205 L196 222 L184 222 Z" fill="#EAF4FB"/>
+<circle cx="190" cy="255" r="17" fill="#FFF6E5"/>
+<path d="M190 245 L193.5 253 L202 254 L195.5 260 L197.5 268 L190 263.5 L182.5 268 L184.5 260 L178 254 L186.5 253 Z" fill="#6B8F71"/>
+<rect x="178" y="182" width="24" height="28" fill="#F2C299"/>
+<circle cx="190" cy="140" r="50" fill="#F2C299"/>
+<ellipse cx="136" cy="140" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="244" cy="140" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="158" cy="152" rx="11" ry="8" fill="#F4A988" opacity="0.6"/>
+<ellipse cx="222" cy="152" rx="11" ry="8" fill="#F4A988" opacity="0.6"/>
+<path d="M164 130 Q172 122 180 130" fill="none" stroke="#3A2A1E" stroke-width="4" stroke-linecap="round"/>
+<path d="M200 130 Q208 122 216 130" fill="none" stroke="#3A2A1E" stroke-width="4" stroke-linecap="round"/>
+<path d="M160 116 Q172 108 184 115" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M196 115 Q208 108 220 116" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M158 152 Q190 186 222 152 Q195 200 158 152 Z" fill="#FFFFFF"/>
+<path d="M158 152 Q190 186 222 152" fill="none" stroke="#8A5A34" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="190" cy="98" rx="64" ry="16" fill="#55735C"/>
+<path d="M132 100 Q132 55 190 55 Q248 55 248 100 Q248 108 240 108 L140 108 Q132 108 132 100 Z" fill="#6B8F71"/>
+<circle cx="190" cy="88" r="15" fill="#FFF6E5"/>
+<path d="M190 78 L193.5 86 L202 87 L195.5 93 L197.5 101 L190 96.5 L182.5 101 L184.5 93 L178 87 L186.5 86 Z" fill="#6B8F71"/>
+</svg>`,
+  checking: `<svg viewBox="0 0 380 500" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="190" cy="465" rx="68" ry="13" fill="#000000" opacity="0.13"/>
+<ellipse cx="165" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<ellipse cx="215" cy="450" rx="21" ry="13" fill="#4A3226"/>
+<rect x="147" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="197" y="335" width="36" height="115" rx="15" fill="#C9B48C"/>
+<rect x="138" y="325" width="104" height="16" rx="5" fill="#4A3226"/>
+<rect x="180" y="326" width="20" height="14" rx="3" fill="#E3B23C"/>
+<path d="M150 220 Q125 235 122 260 L120 285 Q119 293 127 293 Q135 293 136 285 L140 265 Q144 245 165 232 Z" fill="#6B8F71"/>
+<path d="M230 220 Q255 235 258 260 L260 285 Q261 293 253 293 Q245 293 244 285 L240 265 Q236 245 215 232 Z" fill="#6B8F71"/>
+<rect x="160" y="255" width="60" height="78" rx="7" fill="#D8CBB0"/>
+<rect x="166" y="263" width="48" height="62" rx="3" fill="#FFFFFF"/>
+<rect x="172" y="273" width="36" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="172" y="283" width="36" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="172" y="293" width="24" height="4" rx="2" fill="#B9B2A3"/>
+<rect x="180" y="248" width="20" height="10" rx="3" fill="#8A8272"/>
+<circle cx="122" cy="290" r="14" fill="#F2C299"/>
+<circle cx="258" cy="290" r="14" fill="#F2C299"/>
+<line x1="196" y1="284" x2="212" y2="278" stroke="#E3B23C" stroke-width="4" stroke-linecap="round"/>
+<rect x="133" y="205" width="114" height="128" rx="20" fill="#6B8F71"/>
+<path d="M178 205 L202 205 L196 222 L184 222 Z" fill="#EAF4FB"/>
+<rect x="178" y="182" width="24" height="28" fill="#F2C299"/>
+<g transform="rotate(9 190 145)">
+<circle cx="190" cy="145" r="50" fill="#F2C299"/>
+<ellipse cx="136" cy="145" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="244" cy="145" rx="8" ry="12" fill="#F2C299"/>
+<ellipse cx="160" cy="157" rx="10" ry="7" fill="#F4A988" opacity="0.55"/>
+<ellipse cx="220" cy="157" rx="10" ry="7" fill="#F4A988" opacity="0.55"/>
+<circle cx="172" cy="140" r="5" fill="#3A2A1E"/>
+<circle cx="208" cy="140" r="5" fill="#3A2A1E"/>
+<path d="M162 128 Q172 124 182 129" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M198 122 Q208 113 220 118" fill="none" stroke="#6B4423" stroke-width="4" stroke-linecap="round"/>
+<path d="M172 168 Q190 174 208 166" fill="none" stroke="#8A5A34" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="190" cy="103" rx="64" ry="16" fill="#55735C"/>
+<path d="M132 105 Q132 60 190 60 Q248 60 248 105 Q248 113 240 113 L140 113 Q132 113 132 105 Z" fill="#6B8F71"/>
+<circle cx="190" cy="93" r="15" fill="#FFF6E5"/>
+<path d="M190 83 L193.5 91 L202 92 L195.5 98 L197.5 106 L190 101.5 L182.5 106 L184.5 98 L178 92 L186.5 91 Z" fill="#6B8F71"/>
+</g>
+</svg>`,
+};
+
+
+</script>
+<script>
+// ============================================================
+// GAME STATE
+// ============================================================
+const SAVE_KEY = 'recordBreakers_save_v1';
+
+function defaultState() {
+  const progress = {};
+  CATEGORIES.forEach(c => { progress[c.id] = { currentTier: 1, completed: false }; });
+  return {
+    progress,
+    book: [], // array of { catId, tier, name, emoji, fact, value }
+    seenTutorial: false,
+  };
+}
+
+let state = defaultState();
+let currentBooth = null; // category id currently being played
+let currentQuestion = null;
+let hasAnswered = false;
+let selectedCompare = null; // 'less' | 'greater' | 'equal'
+
+// ---------- mascot ----------
+function setMascot(elId, pose) {
+  const el = document.getElementById(elId);
+  if (el && MASCOT_SVGS[pose]) el.innerHTML = MASCOT_SVGS[pose];
+}
+function setMascotEverywhere(pose) {
+  ['mascot-title', 'mascot-hub', 'mascot-play'].forEach(id => setMascot(id, pose));
+}
+
+// ---------- rank titles ----------
+const TOTAL_QUESTIONS = CATEGORIES.reduce((sum, c) => sum + c.tiers, 0);
+const RANK_TITLES = [
+  { min: 0, title: 'Rookie Scout' },
+  { min: 9, title: 'Junior Scout' },
+  { min: 18, title: 'Senior Scout' },
+  { min: 27, title: 'Expert Scout' },
+  { min: TOTAL_QUESTIONS, title: 'Master Record Scout' },
+];
+function getRankTitle(certifiedCount) {
+  let current = RANK_TITLES[0].title;
+  for (const r of RANK_TITLES) {
+    if (certifiedCount >= r.min) current = r.title;
+  }
+  return current;
+}
+
+// ---------- persistence ----------
+async function saveGame() {
+  const payload = JSON.stringify(state);
+  try {
+    if (window.storage && window.storage.set) {
+      await window.storage.set(SAVE_KEY, payload, false);
+    } else {
+      localStorage.setItem(SAVE_KEY, payload);
+    }
+  } catch (e) {
+    try { localStorage.setItem(SAVE_KEY, payload); } catch (e2) { /* ignore */ }
+  }
+}
+async function loadGame() {
+  try {
+    if (window.storage && window.storage.get) {
+      const res = await window.storage.get(SAVE_KEY, false);
+      if (res && res.value) return JSON.parse(res.value);
+      return null;
+    } else {
+      const raw = localStorage.getItem(SAVE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }
+  } catch (e) {
+    try {
+      const raw = localStorage.getItem(SAVE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e2) { return null; }
+  }
+}
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ============================================================
+// TUTORIAL
+// ============================================================
+const TUTORIAL_SLIDES = [
+  { emoji: '🎪', title: 'Welcome, Record Scout!', body: "The World Record Expo is opening, and it needs a scout to verify every wild record before it goes in the official Record Book. That's you!" },
+  { emoji: '📏', title: 'Visit the Booths', body: "Each booth at the Expo tests a different measuring skill — comparing, converting, estimating, adding, subtracting, and multiplying fractions." },
+  { emoji: '✅', title: 'Certify Real Records', body: "Answer correctly to certify a real world record into your Record Book — with the actual Guinness World Record fact! Get it wrong and you'll just try a fresh measurement — no penalty." },
+  { emoji: '🏆', title: 'Fill Your Record Book', body: "Complete every booth to become a Master Record Scout and fill your book with real, wild world records. Let's get measuring!" },
+];
+let tutIndex = 0;
+function renderTutorial() {
+  const slide = TUTORIAL_SLIDES[tutIndex];
+  document.getElementById('tut-card-content').innerHTML = `
+    <div class="tut-emoji">${slide.emoji}</div>
+    <div class="tut-title">${slide.title}</div>
+    <div class="tut-body">${slide.body}</div>
+  `;
+  const dots = document.getElementById('tut-dots');
+  dots.innerHTML = TUTORIAL_SLIDES.map((_, i) => `<div class="tut-dot ${i === tutIndex ? 'active' : ''}"></div>`).join('');
+  document.getElementById('tut-next').textContent = tutIndex === TUTORIAL_SLIDES.length - 1 ? "Let's Go!" : 'Next';
+}
+
+// ============================================================
+// HUB
+// ============================================================
+function renderHub() {
+  setMascot('mascot-hub', 'idle');
+  document.getElementById('hub-rank').textContent = getRankTitle(state.book.length);
+  const grid = document.getElementById('booth-grid');
+  grid.innerHTML = '';
+  CATEGORIES.forEach((cat, idx) => {
+    const prog = state.progress[cat.id];
+    const prevDone = idx === 0 || state.progress[CATEGORIES[idx - 1].id].completed;
+    const locked = !prevDone;
+    const starsFilled = prog.completed ? cat.tiers : (prog.currentTier - 1);
+    let starsHtml = '';
+    for (let i = 0; i < cat.tiers; i++) {
+      starsHtml += `<span class="stamp ${i < starsFilled ? 'filled' : ''}">${i < starsFilled ? '&#10003;' : ''}</span>`;
+    }
+    const card = document.createElement('div');
+    card.className = `booth-card ${locked ? 'locked' : ''} ${prog.completed ? 'done' : ''}`;
+    card.innerHTML = `
+      <div class="booth-icon">${cat.icon}</div>
+      <div class="booth-info">
+        <div class="booth-name">${cat.name}</div>
+        <div class="booth-desc">${cat.desc}</div>
+        <div class="booth-progress">${starsHtml}</div>
+      </div>
+      ${locked ? '<div class="booth-lock-icon">🔒</div>' : (prog.completed ? '<div class="booth-check">✓</div>' : '')}
+    `;
+    if (!locked) {
+      card.addEventListener('click', () => openBoothIntro(cat.id));
+    }
+    grid.appendChild(card);
+  });
+  checkAllComplete();
+}
+function checkAllComplete() {
+  const allDone = CATEGORIES.every(c => state.progress[c.id].completed);
+  if (allDone) {
+    document.getElementById('finale-count').textContent = state.book.length;
+  }
+  return allDone;
+}
+
+function openBoothIntro(catId) {
+  currentBooth = catId;
+  const cat = CATEGORIES.find(c => c.id === catId);
+  document.getElementById('booth-intro-card').innerHTML = `
+    <div class="booth-intro-emoji">${cat.icon}</div>
+    <div class="booth-intro-title">${cat.name}</div>
+    <div class="booth-intro-desc">${cat.introText}</div>
+  `;
+  showScreen('screen-booth-intro');
+}
+
+// ============================================================
+// PLAY / QUESTION FLOW
+// ============================================================
+function startBooth(catId) {
+  currentBooth = catId;
+  loadNextQuestion();
+  showScreen('screen-play');
+}
+
+function loadNextQuestion() {
+  const cat = CATEGORIES.find(c => c.id === currentBooth);
+  const prog = state.progress[currentBooth];
+  const tier = prog.currentTier;
+  currentQuestion = GENERATORS[currentBooth](tier);
+  hasAnswered = false;
+  selectedCompare = null;
+  renderPlayScreen();
+}
+
+function renderPlayScreen() {
+  setMascot('mascot-play', 'idle');
+  const cat = CATEGORIES.find(c => c.id === currentBooth);
+  const prog = state.progress[currentBooth];
+  const pct = Math.round(((prog.currentTier - 1) / cat.tiers) * 100);
+  document.getElementById('play-progressfill').style.width = pct + '%';
+  document.getElementById('play-context-badge').innerHTML = `${cat.icon} ${cat.name} — Question ${prog.currentTier} of ${cat.tiers}`;
+
+  const card = document.getElementById('question-card');
+  card.innerHTML = renderQuestionContent(currentQuestion);
+
+  document.getElementById('feedback-banner').className = 'feedback-banner';
+  document.getElementById('feedback-banner').textContent = '';
+  document.getElementById('btn-submit-answer').style.display = 'inline-block';
+  document.getElementById('btn-submit-answer').disabled = false;
+  document.getElementById('btn-next-question').style.display = 'none';
+
+  attachAnswerHandlers(currentQuestion);
+}
+
+function fracHtml(f) {
+  let out = '';
+  if (f.w && f.w !== 0) out += `<span class="q-mixed-whole">${f.w}</span>`;
+  if (f.n !== 0) {
+    out += `<span class="q-fraction-display"><span class="num">${f.n}</span><span class="den">${f.d}</span></span>`;
+  } else if (!f.w) {
+    out += `<span class="q-mixed-whole">0</span>`;
+  }
+  return out;
+}
+
+function renderQuestionContent(q) {
+  let html = `<div class="q-context">${q.context}</div>`;
+  if (q.type === 'compare') {
+    html += `<div class="q-prompt">Which measurement is larger?</div>`;
+    html += `<div class="q-visual"><div class="q-compare-row">${fracHtml(q.left)} ${symbolCircleHtml()} ${fracHtml(q.right)}</div></div>`;
+  } else if (q.type === 'convert-to-mixed') {
+    html += `<div class="q-prompt">Convert this improper fraction into a mixed number.</div>`;
+    html += `<div class="q-visual">${fracHtml({ w: 0, n: q.given.n, d: q.given.d })}</div>`;
+    html += mixedInputHtml();
+  } else if (q.type === 'convert-to-improper') {
+    html += `<div class="q-prompt">Convert this mixed number into an improper fraction.</div>`;
+    html += `<div class="q-visual">${fracHtml(q.given)}</div>`;
+    html += fractionOnlyInputHtml();
+  } else if (q.type === 'estimate') {
+    html += `<div class="q-prompt">Round each number, then estimate the ${q.op === 'add' ? 'sum' : 'difference'}.</div>`;
+    html += `<div class="q-visual"><div class="q-compare-row">${fracHtml(q.left)} <span class="q-op">${q.op === 'add' ? '+' : '−'}</span> ${fracHtml(q.right)}</div></div>`;
+    html += singleInputHtml('Estimate');
+  } else if (q.type === 'addsub') {
+    if (q.op === 'missing-add') {
+      html += `<div class="q-prompt">What number is missing?</div>`;
+      html += `<div class="q-visual"><div class="q-compare-row">${fracHtml(q.left)} <span class="q-op">+</span> <span style="font-weight:800;font-size:26px;">?</span> <span class="q-op">=</span> ${fracHtml(q.right)}</div></div>`;
+    } else {
+      html += `<div class="q-prompt">Solve exactly.</div>`;
+      html += `<div class="q-visual"><div class="q-compare-row">${fracHtml(q.left)} <span class="q-op">${q.op === 'add' ? '+' : '−'}</span> ${fracHtml(q.right)}</div></div>`;
+    }
+    html += mixedInputHtml();
+  } else if (q.type === 'multiply') {
+    html += `<div class="q-prompt">Solve exactly.</div>`;
+    html += `<div class="q-visual"><div class="q-compare-row">${fracHtml(q.left)} <span class="q-op">×</span> <span class="q-mixed-whole">${q.whole}</span></div></div>`;
+    html += mixedInputHtml();
+  } else if (q.type === 'lineplot-value') {
+    html += `<div class="q-prompt">${q.question}</div>`;
+    html += lineplotHtml(q);
+    html += mixedInputHtml();
+  } else if (q.type === 'lineplot-compare') {
+    html += `<div class="q-prompt">${q.question}</div>`;
+    html += lineplotHtml(q);
+    html += symbolCircleHtml();
+  }
+  return html;
+}
+
+const SYMBOL_LABELS = { less: '<', equal: '=', greater: '>' };
+function symbolCircleHtml() {
+  return `<div class="symbol-circle-wrap"><button type="button" class="symbol-circle" id="symbol-circle-btn">?</button></div>`;
+}
+function mixedInputHtml() {
+  return `<div class="answer-area mixed-input-row">
+    <div class="mn-whole-wrap">
+      <input type="number" class="num-input" id="in-whole" placeholder="0" inputmode="numeric">
+      <div class="mn-label">Whole</div>
+    </div>
+    <div class="mn-frac-wrap">
+      <input type="number" class="num-input" id="in-num" placeholder="n" inputmode="numeric">
+      <div class="mn-divider"></div>
+      <input type="number" class="num-input" id="in-den" placeholder="d" inputmode="numeric">
+      <div class="mn-label">Fraction</div>
+    </div>
+  </div>`;
+}
+function fractionOnlyInputHtml() {
+  return `<div class="answer-area mixed-input-row">
+    <div class="mn-frac-wrap">
+      <input type="number" class="num-input" id="in-num" placeholder="n" inputmode="numeric">
+      <div class="mn-divider"></div>
+      <input type="number" class="num-input" id="in-den" placeholder="d" inputmode="numeric">
+      <div class="mn-label">Fraction</div>
+    </div>
+  </div>`;
+}
+function singleInputHtml(label) {
+  return `<div class="answer-area single-input-row">
+    <input type="number" class="single-input" id="in-single" placeholder="?" inputmode="numeric">
+  </div>`;
+}
+
+function lineplotHtml(q) {
+  const data = q.data;
+  const d = data[0].d;
+  const minW = Math.min(...data.map(p => p.w));
+  const maxW = Math.max(...data.map(p => p.w)) + 1;
+  const totalTicks = (maxW - minW) * d;
+  const trackWidth = Math.max(280, totalTicks * 26);
+  let ticksHtml = '';
+  for (let i = 0; i <= totalTicks; i++) {
+    const leftPct = (i / totalTicks) * 100;
+    if (i % d === 0) {
+      ticksHtml += `<div class="lineplot-tick" style="left:${leftPct}%">${minW + i / d}</div>`;
+      ticksHtml += `<div class="lineplot-tickmark" style="left:${leftPct}%"></div>`;
+    }
+  }
+  // stack dots (as X marks) that land on same position, no per-dot names to avoid clutter
+  const posCount = {};
+  let dotsHtml = '';
+  const sortedForPlot = [...data].sort((a, b) => a.value - b.value);
+  sortedForPlot.forEach(p => {
+    const posIdx = (p.w - minW) * d + p.n;
+    const leftPct = (posIdx / totalTicks) * 100;
+    posCount[posIdx] = (posCount[posIdx] || 0);
+    const stackOffset = posCount[posIdx] * 15;
+    posCount[posIdx]++;
+    dotsHtml += `<div class="lineplot-dot" style="left:${leftPct}%;bottom:${20 + stackOffset}px;">✕</div>`;
+  });
+  const legendHtml = `<div class="lineplot-legend">${data.map(p =>
+    `<div class="lineplot-legend-item"><span class="ll-name">${p.name}</span><span class="ll-val">${formatMixedText(p.w, p.n, p.d)}</span></div>`
+  ).join('')}</div>`;
+  return `<div class="lineplot-wrap"><div class="lineplot-track" style="min-width:${trackWidth}px;">
+    <div class="lineplot-axis"></div>
+    ${ticksHtml}
+    ${dotsHtml}
+  </div></div>${legendHtml}`;
+}
+
+// ---------- answer handlers ----------
+function attachAnswerHandlers(q) {
+  if (q.type === 'compare' || q.type === 'lineplot-compare') {
+    const circle = document.getElementById('symbol-circle-btn');
+    if (circle) {
+      circle.addEventListener('click', () => {
+        document.getElementById('symbol-picker-overlay').classList.add('active');
+      });
+    }
+  }
+}
+
+function wireSymbolPicker() {
+  const overlay = document.getElementById('symbol-picker-overlay');
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+  document.querySelectorAll('.symbol-picker-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedCompare = btn.dataset.choice;
+      const circle = document.getElementById('symbol-circle-btn');
+      if (circle) {
+        circle.textContent = SYMBOL_LABELS[selectedCompare];
+        circle.classList.add('chosen');
+      }
+      overlay.classList.remove('active');
+    });
+  });
+}
+
+function getUserAnswerValue(q) {
+  if (q.type === 'compare' || q.type === 'lineplot-compare') {
+    return selectedCompare;
+  }
+  if (q.type === 'convert-to-improper') {
+    const n = parseFloat(document.getElementById('in-num').value);
+    const d = parseFloat(document.getElementById('in-den').value);
+    if (isNaN(n) || isNaN(d) || d === 0) return null;
+    return n / d;
+  }
+  if (q.type === 'estimate') {
+    const v = parseFloat(document.getElementById('in-single').value);
+    if (isNaN(v)) return null;
+    return v;
+  }
+  // mixed input types
+  const wRaw = document.getElementById('in-whole') ? document.getElementById('in-whole').value : '';
+  const nRaw = document.getElementById('in-num').value;
+  const dRaw = document.getElementById('in-den').value;
+  const w = wRaw === '' ? 0 : parseFloat(wRaw);
+  const n = parseFloat(nRaw);
+  const d = parseFloat(dRaw);
+  if (isNaN(n) || isNaN(d) || d === 0) return null;
+  return w + n / d;
+}
+
+function checkAnswer() {
+  const q = currentQuestion;
+  const userVal = getUserAnswerValue(q);
+  if (userVal === null || userVal === undefined) {
+    flashFeedback('incorrect', "Please fill in an answer first!");
+    return;
+  }
+  setMascot('mascot-play', 'checking');
+  let correct = false;
+  if (q.type === 'compare' || q.type === 'lineplot-compare') {
+    correct = userVal === q.correct;
+  } else if (q.type === 'estimate') {
+    correct = Math.abs(userVal - q.correctValue) <= (q.tolerance || 1) + 1e-9;
+  } else {
+    correct = Math.abs(userVal - q.correctValue) < 1e-6;
+  }
+  hasAnswered = true;
+  document.getElementById('btn-submit-answer').style.display = 'none';
+  document.getElementById('btn-next-question').style.display = 'inline-block';
+
+  if (correct) {
+    setMascot('mascot-play', 'celebrate');
+    flashFeedback('correct', pick(['Certified! 🎉', 'Correct! Record verified!', "That's official!", 'Nailed it!']));
+    certifyRecord(q);
+  } else {
+    setMascot('mascot-play', 'idle');
+    flashFeedback('incorrect', "Not quite — that record can't be certified yet. Let's try a fresh measurement!");
+    document.getElementById('btn-next-question').textContent = 'Try Again →';
+  }
+}
+function flashFeedback(kind, msg) {
+  const el = document.getElementById('feedback-banner');
+  el.className = `feedback-banner ${kind}`;
+  el.textContent = msg;
+}
+
+function nextQuestionOrAdvance() {
+  const wasCorrect = document.getElementById('feedback-banner').classList.contains('correct');
+  document.getElementById('btn-next-question').textContent = 'Next →';
+  if (wasCorrect) {
+    const cat = CATEGORIES.find(c => c.id === currentBooth);
+    const prog = state.progress[currentBooth];
+    prog.currentTier += 1;
+    if (prog.currentTier > cat.tiers) {
+      prog.completed = true;
+      saveGame();
+      showBoothComplete(cat);
+      return;
+    }
+    saveGame();
+    loadNextQuestion();
+  } else {
+    // retry same tier with fresh numbers
+    loadNextQuestion();
+  }
+}
+
+// ============================================================
+// RECORD CERTIFICATION
+// ============================================================
+function certifyRecord(q) {
+  const flavor = q.flavor || pickRecord();
+  const entry = { catId: currentBooth, name: flavor.name, emoji: flavor.emoji, fact: flavor.fact, value: q.recordValue || '', country: flavor.country, pin: flavor.pin };
+  state.book.push(entry);
+  saveGame();
+  showCertOverlay(entry);
+}
+function showCertOverlay(entry) {
+  document.getElementById('cert-card').innerHTML = `
+    <div class="mascot-wrap mascot-cert">${MASCOT_SVGS.celebrate}</div>
+    <div class="cert-emoji">${entry.emoji}</div>
+    <div class="cert-heading">Record Certified</div>
+    <div class="cert-name">${entry.name}</div>
+    <div class="cert-fact">🌍 ${entry.fact}</div>
+    <div class="cert-divider"></div>
+    <div class="cert-practice-label">What you solved</div>
+    <div class="cert-value">${entry.value}</div>
+    <button class="btn" id="btn-cert-next" style="margin-top:18px;width:100%;">Next Record →</button>
+  `;
+  const overlay = document.getElementById('cert-overlay');
+  overlay.classList.add('active');
+  spawnConfetti();
+  document.getElementById('btn-cert-next').addEventListener('click', () => {
+    overlay.classList.remove('active');
+    nextQuestionOrAdvance();
+  });
+}
+function spawnConfetti() {
+  const colors = ['#f4b942', '#ff6f61', '#2ec4b6', '#3ecf6a', '#fffaf0'];
+  const app = document.getElementById('app');
+  for (let i = 0; i < 24; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDuration = (1 + Math.random() * 1.2) + 's';
+    piece.style.zIndex = 60;
+    app.appendChild(piece);
+    setTimeout(() => piece.remove(), 2400);
+  }
+}
+
+function showBoothComplete(cat) {
+  document.getElementById('complete-card').innerHTML = `
+    <div class="mascot-wrap mascot-complete">${MASCOT_SVGS.celebrate}</div>
+    <div class="complete-title">${cat.name} Complete!</div>
+    <div class="complete-sub">Every record at this booth is officially certified.</div>
+    <div class="complete-stars">${'<span class="stamp filled complete-stamp">&#10003;</span>'.repeat(cat.tiers)}</div>
+    <div class="title-buttons" style="margin-top:20px;">
+      <button class="btn" id="btn-complete-continue">Back to Expo</button>
+    </div>
+  `;
+  document.getElementById('complete-overlay').classList.add('active');
+  spawnConfetti();
+  document.getElementById('btn-complete-continue').addEventListener('click', () => {
+    document.getElementById('complete-overlay').classList.remove('active');
+    goToHub();
+  });
+}
+
+// ============================================================
+// RECORD BOOK
+// ============================================================
+function renderBook() {
+  const content = document.getElementById('book-content');
+  if (state.book.length === 0) {
+    content.innerHTML = `<div class="book-empty">Your Record Book is empty so far.<br>Visit a booth at the Expo and certify your first world record!</div>`;
+    return;
+  }
+  let html = '';
+  CATEGORIES.forEach(cat => {
+    const entries = state.book.filter(e => e.catId === cat.id);
+    if (entries.length === 0) return;
+    html += `<div class="book-section-title">${cat.icon} ${cat.name} (${entries.length})</div>`;
+    html += `<div class="book-grid">`;
+    entries.forEach(e => {
+      html += `<div class="book-item">
+        <div class="book-item-emoji">${e.emoji}</div>
+        <div class="book-item-name">${e.name}</div>
+        <div class="book-item-value">${e.value}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  });
+  content.innerHTML = html;
+}
+
+// ============================================================
+// NAVIGATION HELPERS
+// ============================================================
+function goToHub() {
+  renderHub();
+  showScreen('screen-hub');
+  if (checkAllComplete()) {
+    setTimeout(() => showScreen('screen-finale'), 300);
+  }
+}
+
+// ============================================================
+// EVENT WIRING
+// ============================================================
+function wireEvents() {
+  wireSymbolPicker();
+  document.getElementById('btn-new-game').addEventListener('click', () => {
+    state = defaultState();
+    saveGame();
+    tutIndex = 0;
+    renderTutorial();
+    showScreen('screen-tutorial');
+  });
+  document.getElementById('btn-continue').addEventListener('click', () => {
+    goToHub();
+  });
+  document.getElementById('tut-next').addEventListener('click', () => {
+    if (tutIndex < TUTORIAL_SLIDES.length - 1) {
+      tutIndex++;
+      renderTutorial();
+    } else {
+      state.seenTutorial = true;
+      saveGame();
+      goToHub();
+    }
+  });
+  document.getElementById('tut-skip').addEventListener('click', () => {
+    state.seenTutorial = true;
+    saveGame();
+    goToHub();
+  });
+  document.getElementById('btn-open-book').addEventListener('click', () => {
+    renderBook();
+    showScreen('screen-book');
+  });
+  document.getElementById('btn-book-back').addEventListener('click', () => {
+    showScreen('screen-hub');
+  });
+  document.getElementById('btn-start-booth').addEventListener('click', () => {
+    startBooth(currentBooth);
+  });
+  document.getElementById('btn-back-hub-1').addEventListener('click', () => {
+    showScreen('screen-hub');
+  });
+  document.getElementById('btn-exit-play').addEventListener('click', () => {
+    goToHub();
+  });
+  document.getElementById('btn-submit-answer').addEventListener('click', () => {
+    if (!hasAnswered) checkAnswer();
+  });
+  document.getElementById('btn-next-question').addEventListener('click', () => {
+    nextQuestionOrAdvance();
+  });
+  document.getElementById('btn-view-book-finale').addEventListener('click', () => {
+    renderBook();
+    showScreen('screen-book');
+  });
+  document.getElementById('btn-replay').addEventListener('click', () => {
+    state = defaultState();
+    saveGame();
+    goToHub();
+  });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  wireEvents();
+  setMascot('mascot-title', 'idle');
+  const saved = await loadGame();
+  if (saved) {
+    state = Object.assign(defaultState(), saved);
+    document.getElementById('btn-continue').style.display = 'inline-block';
+  }
+}
+init();
+
+</script>
+</body>
+</html>
