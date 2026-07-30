@@ -440,17 +440,22 @@ button{
 .book-title{color:var(--gold);font-size:20px;font-weight:800;}
 .book-empty{color:var(--cream);opacity:0.7;text-align:center;margin-top:60px;font-size:14px;line-height:1.6;}
 .book-section-title{color:var(--cream);font-weight:700;font-size:14px;margin:14px 0 8px;width:100%;opacity:0.9;}
-.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;}
+.book-list{display:flex;flex-direction:column;gap:10px;width:100%;}
 .book-item{
   background:var(--cream);
   border-radius:14px;
-  padding:12px 8px;
-  text-align:center;
+  padding:14px 14px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  text-align:left;
   box-shadow:0 3px 10px rgba(0,0,0,0.2);
 }
-.book-item-emoji{font-size:26px;}
-.book-item-name{font-size:11px;font-weight:700;color:var(--navy);margin-top:4px;line-height:1.25;}
-.book-item-value{font-size:12px;font-weight:800;color:var(--coral-dark);margin-top:3px;}
+.book-item-emoji{font-size:30px;flex-shrink:0;line-height:1;}
+.book-item-text{flex:1;min-width:0;}
+.book-item-name{font-size:clamp(14px, 1.5vw, 17px);font-weight:800;color:var(--navy);line-height:1.25;}
+.book-item-fact{font-size:clamp(12px, 1.3vw, 14px);color:#555;margin-top:4px;line-height:1.4;}
+.book-item-value{font-size:clamp(12px, 1.3vw, 14px);font-weight:700;color:var(--coral-dark);margin-top:6px;}
 
 /* ---------- Finale ---------- */
 #screen-finale .screen-inner{justify-content:center;height:100%;text-align:center;gap:16px;}
@@ -482,6 +487,97 @@ button{
 .mascot-play svg{width:100%;height:100%;}
 .mascot-cert{width:clamp(90px, 10vw, 140px);height:calc(1.3111 * clamp(90px, 10vw, 140px));margin:0 auto 6px;}
 .mascot-complete{width:clamp(100px, 11vw, 155px);height:calc(1.32 * clamp(100px, 11vw, 155px));margin:0 auto 6px;}
+
+/* ---------- Visual Aid Scratchpad (interactive tool) ---------- */
+.va-toggle-row{display:flex;justify-content:center;margin-top:16px;}
+.va-toggle-btn{
+  background:transparent;
+  color:var(--navy-light);
+  border:2px solid #d8cfb8;
+  border-radius:12px;
+  padding:8px 16px;
+  font-size:clamp(12px, 1.3vw, 15px);
+  font-weight:600;
+  font-family:'Poppins',sans-serif;
+}
+.va-toggle-btn:active{transform:translateY(1px);}
+.va-panel{
+  margin-top:12px;
+  background:#fbf6ea;
+  border:1.5px solid #e5ddc8;
+  border-radius:14px;
+  padding:16px 12px 14px;
+}
+.va-instruction{font-size:clamp(11px, 1.2vw, 13px);color:#8a7f5e;font-weight:600;text-align:center;margin-bottom:12px;line-height:1.4;}
+
+.va-armrow{display:flex;gap:8px;justify-content:center;margin-bottom:4px;flex-wrap:wrap;}
+.va-arm-btn{
+  background:#fff;
+  border:2px solid #ccc;
+  border-radius:10px;
+  padding:6px 12px;
+  font-size:clamp(11px, 1.2vw, 13px);
+  font-weight:700;
+  color:#666;
+  font-family:'Poppins',sans-serif;
+}
+.va-arm-a.active{border-color:#2ec4b6;background:#e3f8f5;color:#1a8a7e;}
+.va-arm-b.active{border-color:#ff6f61;background:#ffe9e6;color:#c23f32;}
+.va-arm-btn:disabled{opacity:0.4;cursor:not-allowed;}
+.va-lockhint{text-align:center;font-size:11px;color:#a89b6f;font-weight:600;margin-top:-2px;margin-bottom:8px;font-style:italic;}
+
+.va-line-wrap{overflow-x:auto;padding:50px 10px 30px;}
+.va-line-inner{min-width:260px;}
+.va-line{position:relative;height:3px;background:#333;border-radius:2px;margin:0 14px;}
+.va-tick{position:absolute;top:-6px;width:2px;height:14px;background:#333;transform:translateX(-1px);}
+.va-ticklabel{position:absolute;top:12px;transform:translateX(-50%);font-size:11px;font-weight:700;color:#555;}
+.va-zone{
+  position:absolute;top:-14px;width:20px;height:32px;transform:translateX(-50%);
+  cursor:pointer;
+}
+.va-zone::after{
+  content:"";position:absolute;left:50%;top:14px;width:8px;height:8px;border-radius:50%;
+  background:#d8cfb8;transform:translate(-50%,-50%);
+}
+.va-zone:active::after{background:#bba;}
+.va-zone-whole::after{width:4px;height:4px;background:transparent;}
+.va-dot{
+  position:absolute;top:0;width:16px;height:16px;border-radius:50%;
+  transform:translate(-50%,-50%);border:2.5px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,0.35);
+  z-index:2;
+}
+.va-dot-a{background:#2ec4b6;}
+.va-dot-b{background:#ff6f61;}
+.va-dot-label{
+  position:absolute;top:-16px;transform:translate(-50%,-100%);
+  font-size:11px;font-weight:800;white-space:nowrap;color:#fff;
+  padding:3px 8px;border-radius:8px;z-index:2;
+}
+.va-dot-label.va-dot-a{background:#2ec4b6;}
+.va-dot-label.va-dot-b{background:#ff6f61;}
+
+.va-splitrow{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.va-splitlabel{font-size:12px;color:#8a7f5e;font-weight:600;}
+.pm{
+  width:28px;height:28px;border-radius:8px;border:none;
+  background:var(--navy-light);color:#fff;font-weight:800;font-size:16px;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.pm:active{transform:translateY(1px);}
+.va-splitval,.va-groupval,.va-copyval{font-size:15px;font-weight:800;color:var(--navy);min-width:18px;text-align:center;}
+
+.va-cellrow{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:300px;margin:0 auto;}
+.va-cell{width:22px;height:30px;border-radius:4px;border:1.5px solid rgba(0,0,0,0.15);}
+.va-cell-newgroup{margin-left:8px;}
+
+.va-repeat-wrap{display:flex;gap:3px;overflow-x:auto;padding:4px 2px;justify-content:center;flex-wrap:wrap;}
+.va-repseg{
+  color:#fff;font-weight:800;font-size:12px;
+  padding:10px 8px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  min-width:44px;
+  box-shadow:0 2px 0 rgba(0,0,0,0.15);
+}
 
 ::-webkit-scrollbar{width:0;height:0;}
 </style>
@@ -1245,6 +1341,269 @@ const MASCOT_SVGS = {
 </script>
 <script>
 // ============================================================
+// VISUAL AID SCRATCHPAD — an interactive tool the learner
+// operates themselves. Nothing is pre-plotted or pre-solved:
+// the learner taps to place points and uses steppers to build
+// groupings. Purely optional; never required to answer.
+// ============================================================
+
+let vaState = null;
+
+function vaFracLabel(w, n, d) {
+  if (n === 0) return `${w}`;
+  if (w === 0) return `${n}/${d}`;
+  return `${w} ${n}/${d}`;
+}
+function vaZoneLabel(lo, wholeIdx, rem, splitParts) {
+  const whole = lo + wholeIdx;
+  if (rem === 0) return `${whole}`;
+  if (whole === 0) return `${rem}/${splitParts}`;
+  return `${whole} ${rem}/${splitParts}`;
+}
+
+// ---------- reset per-question state ----------
+function vaInit(q) {
+  vaState = {
+    dots: [null, null],
+    armed: 0,
+    splitParts: 1,
+    groupSize: 1,
+    copies: 1,
+  };
+}
+
+// ---------- bounds helper: derived only from values already visible in the question ----------
+function vaLineBounds(q) {
+  if (q.type === 'compare' || q.type === 'estimate') {
+    const a = mixedValue(q.left.w, q.left.n, q.left.d);
+    const b = mixedValue(q.right.w, q.right.n, q.right.d);
+    return [Math.floor(Math.min(a, b)), Math.ceil(Math.max(a, b))];
+  }
+  if (q.type === 'lineplot-compare') {
+    return [Math.floor(Math.min(q.left.value, q.right.value)), Math.ceil(Math.max(q.left.value, q.right.value))];
+  }
+  if (q.type === 'lineplot-value') {
+    const a = q.extra.a.value, b = q.extra.b.value;
+    return [Math.floor(Math.min(a, b)), Math.ceil(Math.max(a, b)) + 1];
+  }
+  if (q.type === 'addsub') {
+    const a = mixedValue(q.left.w, q.left.n, q.left.d);
+    const b = mixedValue(q.right.w, q.right.n, q.right.d);
+    if (q.op === 'missing-add') {
+      return [Math.floor(Math.min(a, b)), Math.ceil(Math.max(a, b)) + 1];
+    }
+    // give generous room to explore the move without landing exactly on a labeled answer
+    const reach = a + b + 1;
+    return [Math.max(0, Math.floor(a - b - 1)), Math.ceil(reach)];
+  }
+  return [0, 5];
+}
+
+// ---------- number line tool (compare, estimate, addsub, lineplot-*) ----------
+function vaNumberLineHTML(q) {
+  const [lo, hi] = vaLineBounds(q);
+  const span = Math.max(1, hi - lo);
+  const splitParts = vaState.splitParts;
+  const totalSteps = span * splitParts;
+
+  let wholeTicks = '';
+  for (let i = 0; i <= span; i++) {
+    const pct = (i / span) * 100;
+    wholeTicks += `<div class="va-tick" style="left:${pct}%"></div><div class="va-ticklabel" style="left:${pct}%">${lo + i}</div>`;
+  }
+  let zones = '';
+  for (let i = 0; i <= totalSteps; i++) {
+    if (i % splitParts === 0) continue; // whole-number ticks already drawn above
+    const pct = (i / totalSteps) * 100;
+    zones += `<div class="va-zone" data-idx="${i}" style="left:${pct}%"></div>`;
+  }
+  // whole-number positions are also valid tap targets
+  for (let i = 0; i <= span; i++) {
+    const pct = (i / span) * 100;
+    zones += `<div class="va-zone va-zone-whole" data-idx="${i * splitParts}" style="left:${pct}%"></div>`;
+  }
+  let dotsHtml = '';
+  vaState.dots.forEach((d, idx) => {
+    if (d == null) return;
+    const pct = ((d.value - lo) / span) * 100;
+    const cls = idx === 0 ? 'va-dot-a' : 'va-dot-b';
+    dotsHtml += `<div class="va-dot-label ${cls}" style="left:${pct}%">${d.label}</div>`;
+    dotsHtml += `<div class="va-dot ${cls}" style="left:${pct}%"></div>`;
+  });
+
+  const armLabels = vaArmLabels(q);
+
+  return `
+    <div class="va-instruction">${vaInstruction(q)}</div>
+    <div class="va-armrow">
+      <button type="button" class="va-arm-btn va-arm-a ${vaState.armed === 0 ? 'active' : ''}" data-arm="0">${armLabels[0]}</button>
+      <button type="button" class="va-arm-btn va-arm-b ${vaState.armed === 1 ? 'active' : ''}" data-arm="1" ${vaState.dots[0] == null ? 'disabled' : ''}>${armLabels[1]}</button>
+    </div>
+    ${vaState.dots[0] == null ? `<div class="va-lockhint">Place the first number to unlock the second</div>` : ''}
+    <div class="va-line-wrap"><div class="va-line-inner">
+      <div class="va-line">${wholeTicks}${zones}${dotsHtml}</div>
+    </div></div>
+    <div class="va-splitrow">
+      <span class="va-splitlabel">Split each whole into</span>
+      <button type="button" class="va-split-minus pm">−</button>
+      <span class="va-splitval">${splitParts}</span>
+      <button type="button" class="va-split-plus pm">+</button>
+      <span class="va-splitlabel">equal parts</span>
+    </div>`;
+}
+function vaArmLabels(q) {
+  if (q.type === 'compare') return ['📍 First number', '📍 Second number'];
+  if (q.type === 'estimate') return ['📍 First number', '📍 Second number'];
+  if (q.type === 'lineplot-compare') return [`📍 ${q.left.name}`, `📍 ${q.right.name}`];
+  if (q.type === 'lineplot-value') return [`📍 ${q.extra.a.name}`, `📍 ${q.extra.b.name}`];
+  if (q.type === 'addsub') return ['📍 Starting number', '📍 Where you land'];
+  return ['📍 Point 1', '📍 Point 2'];
+}
+function vaInstruction(q) {
+  if (q.type === 'compare') return 'Tap the line to plot each number, then see which is farther right.';
+  if (q.type === 'estimate') return 'Tap the line to plot each number and see which whole it is closest to.';
+  if (q.type === 'lineplot-compare') return `Tap the line to plot ${q.left.name} and ${q.right.name}.`;
+  if (q.type === 'lineplot-value') return `Tap the line to plot both attempts, then look at the gap between them.`;
+  if (q.type === 'addsub') {
+    if (q.op === 'missing-add') return 'Tap the line to plot both known numbers, then look at the gap between them.';
+    const opWord = q.op === 'add' ? 'adding' : 'subtracting';
+    return `Plot your starting number, then tap where you land after ${opWord}.`;
+  }
+  return 'Tap the line to plot points.';
+}
+
+// ---------- groupable bar tool (convert) ----------
+function vaConvertNumerator(q) {
+  return q.type === 'convert-to-mixed' ? q.given.n : (q.given.w * q.given.d + q.given.n);
+}
+function vaGroupedBarHTML(q) {
+  const numerator = vaConvertNumerator(q);
+  const denominator = q.given.d;
+  const groupSize = vaState.groupSize;
+  const colors = ['#6B8F71', '#2ec4b6', '#f4b942', '#ff6f61', '#a78bfa', '#4fb0d9'];
+  let cellsHtml = '';
+  for (let i = 0; i < numerator; i++) {
+    const groupIdx = Math.floor(i / groupSize);
+    const isNewGroup = i % groupSize === 0 && i !== 0;
+    cellsHtml += `<div class="va-cell${isNewGroup ? ' va-cell-newgroup' : ''}" style="background:${colors[groupIdx % colors.length]}"></div>`;
+  }
+  return `
+    <div class="va-instruction">Use the stepper to group these ${numerator} pieces and see how many equal groups you can make.</div>
+    <div class="va-cellrow">${cellsHtml}</div>
+    <div class="va-splitrow">
+      <span class="va-splitlabel">Group into sets of</span>
+      <button type="button" class="va-group-minus pm">−</button>
+      <span class="va-groupval">${groupSize}</span>
+      <button type="button" class="va-group-plus pm">+</button>
+    </div>`;
+}
+
+// ---------- repeatable bar tool (multiply) ----------
+function vaRepeatedBarHTML(q) {
+  const unitLabel = vaFracLabel(q.left.w, q.left.n, q.left.d);
+  const colors = ['#6B8F71', '#2ec4b6', '#f4b942', '#ff6f61', '#a78bfa', '#4fb0d9'];
+  let segsHtml = '';
+  for (let i = 0; i < vaState.copies; i++) {
+    segsHtml += `<div class="va-repseg" style="background:${colors[i % colors.length]}">${unitLabel}</div>`;
+  }
+  return `
+    <div class="va-instruction">Build ${q.whole} copies of ${unitLabel} to see the repeated addition.</div>
+    <div class="va-repeat-wrap">${segsHtml}</div>
+    <div class="va-splitrow">
+      <span class="va-splitlabel">Copies</span>
+      <button type="button" class="va-copy-minus pm">−</button>
+      <span class="va-copyval">${vaState.copies}</span>
+      <button type="button" class="va-copy-plus pm">+</button>
+    </div>`;
+}
+
+// ---------- dispatcher ----------
+function vaBuildHTML(q) {
+  if (['compare', 'estimate', 'addsub', 'lineplot-compare', 'lineplot-value'].includes(q.type)) {
+    return vaNumberLineHTML(q);
+  }
+  if (q.type === 'convert-to-mixed' || q.type === 'convert-to-improper') {
+    return vaGroupedBarHTML(q);
+  }
+  if (q.type === 'multiply') {
+    return vaRepeatedBarHTML(q);
+  }
+  return '';
+}
+
+// ---------- render + wire (full re-render on every interaction; panel is small) ----------
+function vaRenderPanel(q) {
+  const panel = document.getElementById('va-panel');
+  if (!panel) return;
+  panel.innerHTML = vaBuildHTML(q);
+  vaWire(q);
+}
+
+function vaWire(q) {
+  const panel = document.getElementById('va-panel');
+  if (!panel) return;
+
+  panel.querySelectorAll('.va-arm-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      vaState.armed = parseInt(btn.dataset.arm, 10);
+      vaRenderPanel(q);
+    });
+  });
+
+  panel.querySelectorAll('.va-zone').forEach(zone => {
+    zone.addEventListener('click', () => {
+      const [lo] = vaLineBounds(q);
+      const idx = parseInt(zone.dataset.idx, 10);
+      const splitParts = vaState.splitParts;
+      const wholeIdx = Math.floor(idx / splitParts);
+      const rem = idx % splitParts;
+      const value = lo + idx / splitParts;
+      const label = vaZoneLabel(lo, wholeIdx, rem, splitParts);
+      vaState.dots[vaState.armed] = { value, label };
+      // auto-advance to the other point for convenience
+      vaState.armed = vaState.armed === 0 ? 1 : 0;
+      vaRenderPanel(q);
+    });
+  });
+
+  const splitMinus = panel.querySelector('.va-split-minus');
+  const splitPlus = panel.querySelector('.va-split-plus');
+  if (splitMinus) splitMinus.addEventListener('click', () => {
+    vaState.splitParts = Math.max(1, vaState.splitParts - 1);
+    vaRenderPanel(q);
+  });
+  if (splitPlus) splitPlus.addEventListener('click', () => {
+    vaState.splitParts = Math.min(12, vaState.splitParts + 1);
+    vaRenderPanel(q);
+  });
+
+  const groupMinus = panel.querySelector('.va-group-minus');
+  const groupPlus = panel.querySelector('.va-group-plus');
+  if (groupMinus) groupMinus.addEventListener('click', () => {
+    vaState.groupSize = Math.max(1, vaState.groupSize - 1);
+    vaRenderPanel(q);
+  });
+  if (groupPlus) groupPlus.addEventListener('click', () => {
+    const maxGroup = vaConvertNumerator(q);
+    vaState.groupSize = Math.min(maxGroup, vaState.groupSize + 1);
+    vaRenderPanel(q);
+  });
+
+  const copyMinus = panel.querySelector('.va-copy-minus');
+  const copyPlus = panel.querySelector('.va-copy-plus');
+  if (copyMinus) copyMinus.addEventListener('click', () => {
+    vaState.copies = Math.max(1, vaState.copies - 1);
+    vaRenderPanel(q);
+  });
+  if (copyPlus) copyPlus.addEventListener('click', () => {
+    vaState.copies = Math.min(10, vaState.copies + 1);
+    vaRenderPanel(q);
+  });
+}
+
+</script>
+<script>
+// ============================================================
 // GAME STATE
 // ============================================================
 const SAVE_KEY = 'recordBreakers_save_v1';
@@ -1362,8 +1721,7 @@ function renderHub() {
   grid.innerHTML = '';
   CATEGORIES.forEach((cat, idx) => {
     const prog = state.progress[cat.id];
-    const prevDone = idx === 0 || state.progress[CATEGORIES[idx - 1].id].completed;
-    const locked = !prevDone;
+    const locked = false; // all booths open from the start; play in any order
     const starsFilled = prog.completed ? cat.tiers : (prog.currentTier - 1);
     let starsHtml = '';
     for (let i = 0; i < cat.tiers; i++) {
@@ -1422,6 +1780,7 @@ function loadNextQuestion() {
   currentQuestion = GENERATORS[currentBooth](tier);
   hasAnswered = false;
   selectedCompare = null;
+  vaInit(currentQuestion);
   renderPlayScreen();
 }
 
@@ -1495,6 +1854,10 @@ function renderQuestionContent(q) {
     html += lineplotHtml(q);
     html += symbolCircleHtml();
   }
+  html += `<div class="va-toggle-row">
+    <button type="button" class="va-toggle-btn" id="va-toggle-btn">🔍 Use a tool</button>
+  </div>
+  <div class="va-panel" id="va-panel" style="display:none;"></div>`;
   return html;
 }
 
@@ -1571,6 +1934,20 @@ function lineplotHtml(q) {
 
 // ---------- answer handlers ----------
 function attachAnswerHandlers(q) {
+  const vaBtn = document.getElementById('va-toggle-btn');
+  if (vaBtn) {
+    let vaBuilt = false;
+    vaBtn.addEventListener('click', () => {
+      const panel = document.getElementById('va-panel');
+      const isHidden = panel.style.display === 'none';
+      if (isHidden && !vaBuilt) {
+        vaRenderPanel(q);
+        vaBuilt = true;
+      }
+      panel.style.display = isHidden ? 'block' : 'none';
+      vaBtn.textContent = isHidden ? '✕ Hide tool' : '🔍 Use a tool';
+    });
+  }
   if (q.type === 'compare' || q.type === 'lineplot-compare') {
     const circle = document.getElementById('symbol-circle-btn');
     if (circle) {
@@ -1619,6 +1996,11 @@ function getUserAnswerValue(q) {
   const nRaw = document.getElementById('in-num').value;
   const dRaw = document.getElementById('in-den').value;
   const w = wRaw === '' ? 0 : parseFloat(wRaw);
+  if (nRaw === '' && dRaw === '') {
+    // whole-number-only answer is valid (e.g. "2" with the fraction left blank)
+    if (wRaw === '') return null;
+    return w;
+  }
   const n = parseFloat(nRaw);
   const d = parseFloat(dRaw);
   if (isNaN(n) || isNaN(d) || d === 0) return null;
@@ -1759,12 +2141,15 @@ function renderBook() {
     const entries = state.book.filter(e => e.catId === cat.id);
     if (entries.length === 0) return;
     html += `<div class="book-section-title">${cat.icon} ${cat.name} (${entries.length})</div>`;
-    html += `<div class="book-grid">`;
+    html += `<div class="book-list">`;
     entries.forEach(e => {
       html += `<div class="book-item">
         <div class="book-item-emoji">${e.emoji}</div>
-        <div class="book-item-name">${e.name}</div>
-        <div class="book-item-value">${e.value}</div>
+        <div class="book-item-text">
+          <div class="book-item-name">${e.name}</div>
+          <div class="book-item-fact">🌍 ${e.fact}</div>
+          <div class="book-item-value">You solved: ${e.value}</div>
+        </div>
       </div>`;
     });
     html += `</div>`;
