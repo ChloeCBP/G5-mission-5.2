@@ -526,7 +526,7 @@ button{
 .va-arm-btn:disabled{opacity:0.4;cursor:not-allowed;}
 .va-lockhint{text-align:center;font-size:11px;color:#a89b6f;font-weight:600;margin-top:-2px;margin-bottom:8px;font-style:italic;}
 
-.va-line-wrap{overflow-x:auto;padding:50px 10px 30px;}
+.va-line-wrap{overflow-x:auto;padding:64px 10px 30px;}
 .va-line-inner{min-width:260px;}
 .va-line{position:relative;height:3px;background:#333;border-radius:2px;margin:0 14px;}
 .va-tick{position:absolute;top:-6px;width:2px;height:14px;background:#333;transform:translateX(-1px);}
@@ -564,19 +564,40 @@ button{
   display:inline-flex;align-items:center;justify-content:center;
 }
 .pm:active{transform:translateY(1px);}
-.va-splitval,.va-groupval,.va-copyval{font-size:15px;font-weight:800;color:var(--navy);min-width:18px;text-align:center;}
+.va-splitval,.va-wholestepval,.va-hopval,.va-peelval{font-size:15px;font-weight:800;color:var(--navy);min-width:18px;text-align:center;}
 
-.va-cellrow{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-width:300px;margin:0 auto;}
-.va-cell{width:22px;height:30px;border-radius:4px;border:1.5px solid rgba(0,0,0,0.15);}
-.va-cell-newgroup{margin-left:8px;}
+.va-hoparc{
+  position:absolute;top:-16px;height:22px;
+  border:2.5px solid #ff6f61;border-bottom:none;
+  border-radius:50% 50% 0 0/22px 22px 0 0;
+  box-sizing:border-box;
+}
+.va-hoplabel{
+  position:absolute;top:-38px;transform:translateX(-50%);
+  font-size:10px;font-weight:800;color:#c23f32;white-space:nowrap;
+}
 
-.va-repeat-wrap{display:flex;gap:3px;overflow-x:auto;padding:4px 2px;justify-content:center;flex-wrap:wrap;}
-.va-repseg{
-  color:#fff;font-weight:800;font-size:12px;
-  padding:10px 8px;border-radius:8px;
-  display:flex;align-items:center;justify-content:center;
-  min-width:44px;
-  box-shadow:0 2px 0 rgba(0,0,0,0.15);
+.va-viewtoggle{display:flex;gap:8px;justify-content:center;margin-bottom:12px;}
+.va-view-btn{
+  background:#fff;border:2px solid #ccc;border-radius:10px;
+  padding:7px 14px;font-size:12px;font-weight:700;color:#666;
+  font-family:'Poppins',sans-serif;
+}
+.va-view-btn.active{border-color:var(--navy-light);background:#e8ecf5;color:var(--navy);}
+
+.va-bond{display:flex;flex-direction:column;align-items:center;margin:8px 0 16px;}
+.va-bond-top{
+  background:var(--navy);color:#fff;font-weight:800;font-size:14px;
+  padding:6px 14px;border-radius:10px;
+}
+.va-bond-lines{position:relative;width:120px;height:22px;}
+.va-bond-line{position:absolute;top:0;width:2px;height:22px;background:#999;}
+.va-bond-line-l{left:30%;transform:rotate(20deg);transform-origin:top;}
+.va-bond-line-r{left:70%;transform:rotate(-20deg);transform-origin:top;}
+.va-bond-branches{display:flex;gap:24px;}
+.va-bond-branch{
+  background:#fff;border:2px solid var(--navy-light);color:var(--navy);
+  font-weight:800;font-size:13px;padding:6px 12px;border-radius:10px;
 }
 
 ::-webkit-scrollbar{width:0;height:0;}
@@ -1342,9 +1363,11 @@ const MASCOT_SVGS = {
 <script>
 // ============================================================
 // VISUAL AID SCRATCHPAD — an interactive tool the learner
-// operates themselves. Nothing is pre-plotted or pre-solved:
-// the learner taps to place points and uses steppers to build
-// groupings. Purely optional; never required to answer.
+// operates themselves, modeled on the actual visual strategies
+// used in the curriculum (number lines with benchmark plotting,
+// number bonds for decomposition, and hop-arcs for repeated
+// addition). Nothing is pre-plotted or pre-solved; the learner
+// builds each piece themselves. Purely optional.
 // ============================================================
 
 let vaState = null;
@@ -1367,12 +1390,75 @@ function vaInit(q) {
     dots: [null, null],
     armed: 0,
     splitParts: 1,
-    groupSize: 1,
-    copies: 1,
+    wholeSteps: 0,   // convert: how many wholes taken out via the bond stepper
+    hopCount: 0,     // multiply: how many copies built via the hop stepper
+    peelOff: 0,      // addsub bond: how much peeled from the second number
+    view: 'line',    // addsub toggle: 'line' | 'bond'
   };
 }
 
-// ---------- bounds helper: derived only from values already visible in the question ----------
+// ============================================================
+// LOW-LEVEL LINE PRIMITIVES (ticks, tap-zones, dots, arcs)
+// ============================================================
+function vaTicksHTML(lo, hi) {
+  const span = Math.max(1, hi - lo);
+  let html = '';
+  for (let i = 0; i <= span; i++) {
+    const pct = (i / span) * 100;
+    html += `<div class="va-tick" style="left:${pct}%"></div><div class="va-ticklabel" style="left:${pct}%">${lo + i}</div>`;
+  }
+  return html;
+}
+function vaZonesHTML(lo, hi, splitParts) {
+  const span = Math.max(1, hi - lo);
+  const totalSteps = span * splitParts;
+  let html = '';
+  for (let i = 0; i <= totalSteps; i++) {
+    const pct = (i / totalSteps) * 100;
+    const isWhole = i % splitParts === 0;
+    html += `<div class="va-zone${isWhole ? ' va-zone-whole' : ''}" data-idx="${i}" style="left:${pct}%"></div>`;
+  }
+  return html;
+}
+function vaDotsHTML(dots, lo, hi) {
+  const span = Math.max(1, hi - lo);
+  let html = '';
+  dots.forEach((d, idx) => {
+    if (d == null) return;
+    const pct = ((d.value - lo) / span) * 100;
+    const cls = idx === 0 ? 'va-dot-a' : 'va-dot-b';
+    html += `<div class="va-dot-label ${cls}" style="left:${pct}%">${d.label}</div>`;
+    html += `<div class="va-dot ${cls}" style="left:${pct}%"></div>`;
+  });
+  return html;
+}
+// arcs: array of {from, to, label} values (in the line's own units) drawn as hops above the line
+function vaArcsHTML(arcs, lo, hi) {
+  const span = Math.max(1, hi - lo);
+  let html = '';
+  arcs.forEach((arc, i) => {
+    const p1 = ((arc.from - lo) / span) * 100;
+    const p2 = ((arc.to - lo) / span) * 100;
+    const left = Math.min(p1, p2), width = Math.abs(p2 - p1);
+    html += `<div class="va-hoparc" style="left:${left}%;width:${width}%"></div>`;
+    html += `<div class="va-hoplabel" style="left:${p2}%">${arc.label}</div>`;
+  });
+  return html;
+}
+function vaBondHTML(topLabel, leftLabel, rightLabel) {
+  return `<div class="va-bond">
+    <div class="va-bond-top">${topLabel}</div>
+    <div class="va-bond-lines"><div class="va-bond-line va-bond-line-l"></div><div class="va-bond-line va-bond-line-r"></div></div>
+    <div class="va-bond-branches">
+      <div class="va-bond-branch va-bond-branch-l">${leftLabel}</div>
+      <div class="va-bond-branch va-bond-branch-r">${rightLabel}</div>
+    </div>
+  </div>`;
+}
+
+// ============================================================
+// COMPARE / ESTIMATE / LINE PLOT — plot points on a shared line
+// ============================================================
 function vaLineBounds(q) {
   if (q.type === 'compare' || q.type === 'estimate') {
     const a = mixedValue(q.left.w, q.left.n, q.left.d);
@@ -1389,67 +1475,11 @@ function vaLineBounds(q) {
   if (q.type === 'addsub') {
     const a = mixedValue(q.left.w, q.left.n, q.left.d);
     const b = mixedValue(q.right.w, q.right.n, q.right.d);
-    if (q.op === 'missing-add') {
-      return [Math.floor(Math.min(a, b)), Math.ceil(Math.max(a, b)) + 1];
-    }
-    // give generous room to explore the move without landing exactly on a labeled answer
+    if (q.op === 'missing-add') return [Math.floor(Math.min(a, b)), Math.ceil(Math.max(a, b)) + 1];
     const reach = a + b + 1;
     return [Math.max(0, Math.floor(a - b - 1)), Math.ceil(reach)];
   }
   return [0, 5];
-}
-
-// ---------- number line tool (compare, estimate, addsub, lineplot-*) ----------
-function vaNumberLineHTML(q) {
-  const [lo, hi] = vaLineBounds(q);
-  const span = Math.max(1, hi - lo);
-  const splitParts = vaState.splitParts;
-  const totalSteps = span * splitParts;
-
-  let wholeTicks = '';
-  for (let i = 0; i <= span; i++) {
-    const pct = (i / span) * 100;
-    wholeTicks += `<div class="va-tick" style="left:${pct}%"></div><div class="va-ticklabel" style="left:${pct}%">${lo + i}</div>`;
-  }
-  let zones = '';
-  for (let i = 0; i <= totalSteps; i++) {
-    if (i % splitParts === 0) continue; // whole-number ticks already drawn above
-    const pct = (i / totalSteps) * 100;
-    zones += `<div class="va-zone" data-idx="${i}" style="left:${pct}%"></div>`;
-  }
-  // whole-number positions are also valid tap targets
-  for (let i = 0; i <= span; i++) {
-    const pct = (i / span) * 100;
-    zones += `<div class="va-zone va-zone-whole" data-idx="${i * splitParts}" style="left:${pct}%"></div>`;
-  }
-  let dotsHtml = '';
-  vaState.dots.forEach((d, idx) => {
-    if (d == null) return;
-    const pct = ((d.value - lo) / span) * 100;
-    const cls = idx === 0 ? 'va-dot-a' : 'va-dot-b';
-    dotsHtml += `<div class="va-dot-label ${cls}" style="left:${pct}%">${d.label}</div>`;
-    dotsHtml += `<div class="va-dot ${cls}" style="left:${pct}%"></div>`;
-  });
-
-  const armLabels = vaArmLabels(q);
-
-  return `
-    <div class="va-instruction">${vaInstruction(q)}</div>
-    <div class="va-armrow">
-      <button type="button" class="va-arm-btn va-arm-a ${vaState.armed === 0 ? 'active' : ''}" data-arm="0">${armLabels[0]}</button>
-      <button type="button" class="va-arm-btn va-arm-b ${vaState.armed === 1 ? 'active' : ''}" data-arm="1" ${vaState.dots[0] == null ? 'disabled' : ''}>${armLabels[1]}</button>
-    </div>
-    ${vaState.dots[0] == null ? `<div class="va-lockhint">Place the first number to unlock the second</div>` : ''}
-    <div class="va-line-wrap"><div class="va-line-inner">
-      <div class="va-line">${wholeTicks}${zones}${dotsHtml}</div>
-    </div></div>
-    <div class="va-splitrow">
-      <span class="va-splitlabel">Split each whole into</span>
-      <button type="button" class="va-split-minus pm">−</button>
-      <span class="va-splitval">${splitParts}</span>
-      <button type="button" class="va-split-plus pm">+</button>
-      <span class="va-splitlabel">equal parts</span>
-    </div>`;
 }
 function vaArmLabels(q) {
   if (q.type === 'compare') return ['📍 First number', '📍 Second number'];
@@ -1460,7 +1490,7 @@ function vaArmLabels(q) {
   return ['📍 Point 1', '📍 Point 2'];
 }
 function vaInstruction(q) {
-  if (q.type === 'compare') return 'Tap the line to plot each number, then see which is farther right.';
+  if (q.type === 'compare') return 'Tap the line to plot each number using benchmarks, then see which is farther right.';
   if (q.type === 'estimate') return 'Tap the line to plot each number and see which whole it is closest to.';
   if (q.type === 'lineplot-compare') return `Tap the line to plot ${q.left.name} and ${q.right.name}.`;
   if (q.type === 'lineplot-value') return `Tap the line to plot both attempts, then look at the gap between them.`;
@@ -1471,67 +1501,165 @@ function vaInstruction(q) {
   }
   return 'Tap the line to plot points.';
 }
-
-// ---------- groupable bar tool (convert) ----------
-function vaConvertNumerator(q) {
-  return q.type === 'convert-to-mixed' ? q.given.n : (q.given.w * q.given.d + q.given.n);
-}
-function vaGroupedBarHTML(q) {
-  const numerator = vaConvertNumerator(q);
-  const denominator = q.given.d;
-  const groupSize = vaState.groupSize;
-  const colors = ['#6B8F71', '#2ec4b6', '#f4b942', '#ff6f61', '#a78bfa', '#4fb0d9'];
-  let cellsHtml = '';
-  for (let i = 0; i < numerator; i++) {
-    const groupIdx = Math.floor(i / groupSize);
-    const isNewGroup = i % groupSize === 0 && i !== 0;
-    cellsHtml += `<div class="va-cell${isNewGroup ? ' va-cell-newgroup' : ''}" style="background:${colors[groupIdx % colors.length]}"></div>`;
-  }
+function vaTwoDotNumberLineHTML(q) {
+  const [lo, hi] = vaLineBounds(q);
+  const armLabels = vaArmLabels(q);
   return `
-    <div class="va-instruction">Use the stepper to group these ${numerator} pieces and see how many equal groups you can make.</div>
-    <div class="va-cellrow">${cellsHtml}</div>
-    <div class="va-splitrow">
-      <span class="va-splitlabel">Group into sets of</span>
-      <button type="button" class="va-group-minus pm">−</button>
-      <span class="va-groupval">${groupSize}</span>
-      <button type="button" class="va-group-plus pm">+</button>
+    <div class="va-instruction">${vaInstruction(q)}</div>
+    <div class="va-armrow">
+      <button type="button" class="va-arm-btn va-arm-a ${vaState.armed === 0 ? 'active' : ''}" data-arm="0">${armLabels[0]}</button>
+      <button type="button" class="va-arm-btn va-arm-b ${vaState.armed === 1 ? 'active' : ''}" data-arm="1" ${vaState.dots[0] == null ? 'disabled' : ''}>${armLabels[1]}</button>
+    </div>
+    ${vaState.dots[0] == null ? `<div class="va-lockhint">Place the first number to unlock the second</div>` : ''}
+    <div class="va-line-wrap"><div class="va-line-inner">
+      <div class="va-line">${vaTicksHTML(lo, hi)}${vaZonesHTML(lo, hi, vaState.splitParts)}${vaDotsHTML(vaState.dots, lo, hi)}</div>
+    </div></div>
+    ${vaSplitRowHTML()}`;
+}
+function vaSplitRowHTML() {
+  return `<div class="va-splitrow">
+      <span class="va-splitlabel">Split each whole into</span>
+      <button type="button" class="va-split-minus pm">−</button>
+      <span class="va-splitval">${vaState.splitParts}</span>
+      <button type="button" class="va-split-plus pm">+</button>
+      <span class="va-splitlabel">equal parts</span>
     </div>`;
 }
 
-// ---------- repeatable bar tool (multiply) ----------
-function vaRepeatedBarHTML(q) {
-  const unitLabel = vaFracLabel(q.left.w, q.left.n, q.left.d);
-  const colors = ['#6B8F71', '#2ec4b6', '#f4b942', '#ff6f61', '#a78bfa', '#4fb0d9'];
-  let segsHtml = '';
-  for (let i = 0; i < vaState.copies; i++) {
-    segsHtml += `<div class="va-repseg" style="background:${colors[i % colors.length]}">${unitLabel}</div>`;
+// ============================================================
+// CONVERT — number bond (decompose) + number line (plot), matching
+// the curriculum's paired bond + number-line presentation.
+// ============================================================
+function vaConvertGivenValue(q) {
+  return q.type === 'convert-to-mixed' ? q.given.n / q.given.d : mixedValue(q.given.w, q.given.n, q.given.d);
+}
+function vaConvertBondHTML(q) {
+  const d = q.given.d;
+  if (q.type === 'convert-to-mixed') {
+    const n = q.given.n;
+    const maxSteps = Math.floor(n / d);
+    const taken = vaState.wholeSteps;
+    const takenNum = taken * d;
+    const leftoverNum = n - takenNum;
+    return `
+      <div class="va-instruction">Decompose ${n}/${d} with a number bond: break off whole groups of ${d}, then see what's left.</div>
+      ${vaBondHTML(`${n}/${d}`, `${takenNum}/${d}`, `${leftoverNum}/${d}`)}
+      <div class="va-splitrow">
+        <span class="va-splitlabel">Break off whole groups of ${d}:</span>
+        <button type="button" class="va-wholestep-minus pm">−</button>
+        <span class="va-wholestepval">${taken}</span>
+        <button type="button" class="va-wholestep-plus pm">+</button>
+      </div>`;
+  } else {
+    const w = q.given.w, n = q.given.n;
+    const built = vaState.wholeSteps; // how many of the w wholes have been converted to d-ths so far
+    const builtNum = built * d;
+    return `
+      <div class="va-instruction">Decompose ${vaFracLabel(w, n, d)} with a number bond: turn each whole into ${d}ths, then add on ${n}/${d}.</div>
+      ${vaBondHTML(vaFracLabel(w, n, d), `${builtNum}/${d}`, `${n}/${d}`)}
+      <div class="va-splitrow">
+        <span class="va-splitlabel">Wholes converted to ${d}ths:</span>
+        <button type="button" class="va-wholestep-minus pm">−</button>
+        <span class="va-wholestepval">${built}</span>
+        <button type="button" class="va-wholestep-plus pm">+</button>
+      </div>`;
+  }
+}
+function vaConvertHTML(q) {
+  const d = q.given.d;
+  const givenVal = vaConvertGivenValue(q);
+  const hi = Math.ceil(givenVal) + 1;
+  const lo = 0;
+  const taken = vaState.wholeSteps;
+  const arcs = [];
+  for (let k = 0; k < taken; k++) {
+    arcs.push({ from: k, to: k + 1, label: `${(k + 1) * d}/${d}` });
   }
   return `
-    <div class="va-instruction">Build ${q.whole} copies of ${unitLabel} to see the repeated addition.</div>
-    <div class="va-repeat-wrap">${segsHtml}</div>
+    ${vaConvertBondHTML(q)}
+    <div class="va-instruction">Now tap the line to plot where the full number lands.</div>
+    <div class="va-line-wrap"><div class="va-line-inner">
+      <div class="va-line">${vaTicksHTML(lo, hi)}${vaArcsHTML(arcs, lo, hi)}${vaZonesHTML(lo, hi, vaState.splitParts)}${vaDotsHTML([vaState.dots[0], null], lo, hi)}</div>
+    </div></div>
+    ${vaSplitRowHTML()}`;
+}
+
+// ============================================================
+// MULTIPLY — number line with repeated equal hop-arcs
+// ============================================================
+function vaMultiplyHTML(q) {
+  const base = mixedValue(q.left.w, q.left.n, q.left.d);
+  const d = q.left.d;
+  const baseNum = q.left.w * d + q.left.n;
+  const hi = Math.ceil(base * q.whole) + 1;
+  const lo = 0;
+  const hops = vaState.hopCount;
+  const arcs = [];
+  for (let k = 0; k < hops; k++) {
+    arcs.push({ from: k * base, to: (k + 1) * base, label: `${(k + 1) * baseNum}/${d}` });
+  }
+  return `
+    <div class="va-instruction">Build ${q.whole} equal hops of ${vaFracLabel(q.left.w, q.left.n, q.left.d)} to see the repeated addition.</div>
+    <div class="va-line-wrap"><div class="va-line-inner">
+      <div class="va-line">${vaTicksHTML(lo, hi)}${vaArcsHTML(arcs, lo, hi)}</div>
+    </div></div>
     <div class="va-splitrow">
-      <span class="va-splitlabel">Copies</span>
-      <button type="button" class="va-copy-minus pm">−</button>
-      <span class="va-copyval">${vaState.copies}</span>
-      <button type="button" class="va-copy-plus pm">+</button>
+      <span class="va-splitlabel">Hops built</span>
+      <button type="button" class="va-hop-minus pm">−</button>
+      <span class="va-hopval">${hops} / ${q.whole}</span>
+      <button type="button" class="va-hop-plus pm">+</button>
     </div>`;
 }
 
-// ---------- dispatcher ----------
+// ============================================================
+// ADD/SUB — toggle between number line and number bond (decompose
+// the second number to complete a whole, matching the curriculum's
+// primary "make one" strategy)
+// ============================================================
+function vaAddSubBondHTML(q) {
+  const rightNum = q.right.n, rightDen = q.right.d;
+  const leftLabel = vaFracLabel(q.left.w, q.left.n, q.left.d);
+  const rightLabel = vaFracLabel(q.right.w, q.right.n, q.right.d);
+  const peel = vaState.peelOff;
+  const leftover = rightNum - peel;
+  const verb = q.op === 'add' ? 'complete a whole with' : 'subtract down to a whole from';
+  return `
+    <div class="va-instruction">${leftLabel} ${q.op === 'add' ? '+' : '−'} ${rightLabel}. Try peeling off just enough from ${rightLabel} to ${verb} ${leftLabel}.</div>
+    ${vaBondHTML(`${rightNum}/${rightDen}`, `${peel}/${rightDen}`, `${leftover}/${rightDen}`)}
+    <div class="va-splitrow">
+      <span class="va-splitlabel">Peel off</span>
+      <button type="button" class="va-peel-minus pm">−</button>
+      <span class="va-peelval">${peel}/${rightDen}</span>
+      <button type="button" class="va-peel-plus pm">+</button>
+    </div>`;
+}
+function vaAddSubHTML(q) {
+  const canBond = q.op === 'add' || q.op === 'subtract';
+  const toggleRow = canBond ? `
+    <div class="va-viewtoggle">
+      <button type="button" class="va-view-btn ${vaState.view === 'line' ? 'active' : ''}" data-view="line">🔢 Number Line</button>
+      <button type="button" class="va-view-btn ${vaState.view === 'bond' ? 'active' : ''}" data-view="bond">🔗 Number Bond</button>
+    </div>` : '';
+  const body = (canBond && vaState.view === 'bond') ? vaAddSubBondHTML(q) : vaTwoDotNumberLineHTML(q);
+  return `${toggleRow}${body}`;
+}
+
+// ============================================================
+// DISPATCHER
+// ============================================================
 function vaBuildHTML(q) {
-  if (['compare', 'estimate', 'addsub', 'lineplot-compare', 'lineplot-value'].includes(q.type)) {
-    return vaNumberLineHTML(q);
+  if (['compare', 'estimate', 'lineplot-compare', 'lineplot-value'].includes(q.type)) {
+    return vaTwoDotNumberLineHTML(q);
   }
-  if (q.type === 'convert-to-mixed' || q.type === 'convert-to-improper') {
-    return vaGroupedBarHTML(q);
-  }
-  if (q.type === 'multiply') {
-    return vaRepeatedBarHTML(q);
-  }
+  if (q.type === 'addsub') return vaAddSubHTML(q);
+  if (q.type === 'convert-to-mixed' || q.type === 'convert-to-improper') return vaConvertHTML(q);
+  if (q.type === 'multiply') return vaMultiplyHTML(q);
   return '';
 }
 
-// ---------- render + wire (full re-render on every interaction; panel is small) ----------
+// ============================================================
+// RENDER + WIRE
+// ============================================================
 function vaRenderPanel(q) {
   const panel = document.getElementById('va-panel');
   if (!panel) return;
@@ -1543,6 +1671,13 @@ function vaWire(q) {
   const panel = document.getElementById('va-panel');
   if (!panel) return;
 
+  panel.querySelectorAll('.va-view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      vaState.view = btn.dataset.view;
+      vaRenderPanel(q);
+    });
+  });
+
   panel.querySelectorAll('.va-arm-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       vaState.armed = parseInt(btn.dataset.arm, 10);
@@ -1552,51 +1687,47 @@ function vaWire(q) {
 
   panel.querySelectorAll('.va-zone').forEach(zone => {
     zone.addEventListener('click', () => {
-      const [lo] = vaLineBounds(q);
+      const [lo] = (q.type === 'convert-to-mixed' || q.type === 'convert-to-improper') ? [0] : vaLineBounds(q);
       const idx = parseInt(zone.dataset.idx, 10);
       const splitParts = vaState.splitParts;
       const wholeIdx = Math.floor(idx / splitParts);
       const rem = idx % splitParts;
       const value = lo + idx / splitParts;
       const label = vaZoneLabel(lo, wholeIdx, rem, splitParts);
-      vaState.dots[vaState.armed] = { value, label };
-      // auto-advance to the other point for convenience
-      vaState.armed = vaState.armed === 0 ? 1 : 0;
+      if (q.type === 'convert-to-mixed' || q.type === 'convert-to-improper') {
+        vaState.dots[0] = { value, label };
+      } else {
+        vaState.dots[vaState.armed] = { value, label };
+        vaState.armed = vaState.armed === 0 ? 1 : 0;
+      }
       vaRenderPanel(q);
     });
   });
 
   const splitMinus = panel.querySelector('.va-split-minus');
   const splitPlus = panel.querySelector('.va-split-plus');
-  if (splitMinus) splitMinus.addEventListener('click', () => {
-    vaState.splitParts = Math.max(1, vaState.splitParts - 1);
-    vaRenderPanel(q);
-  });
-  if (splitPlus) splitPlus.addEventListener('click', () => {
-    vaState.splitParts = Math.min(12, vaState.splitParts + 1);
+  if (splitMinus) splitMinus.addEventListener('click', () => { vaState.splitParts = Math.max(1, vaState.splitParts - 1); vaRenderPanel(q); });
+  if (splitPlus) splitPlus.addEventListener('click', () => { vaState.splitParts = Math.min(12, vaState.splitParts + 1); vaRenderPanel(q); });
+
+  const wsMinus = panel.querySelector('.va-wholestep-minus');
+  const wsPlus = panel.querySelector('.va-wholestep-plus');
+  if (wsMinus) wsMinus.addEventListener('click', () => { vaState.wholeSteps = Math.max(0, vaState.wholeSteps - 1); vaRenderPanel(q); });
+  if (wsPlus) wsPlus.addEventListener('click', () => {
+    const maxSteps = q.type === 'convert-to-mixed' ? Math.floor(q.given.n / q.given.d) : q.given.w;
+    vaState.wholeSteps = Math.min(maxSteps, vaState.wholeSteps + 1);
     vaRenderPanel(q);
   });
 
-  const groupMinus = panel.querySelector('.va-group-minus');
-  const groupPlus = panel.querySelector('.va-group-plus');
-  if (groupMinus) groupMinus.addEventListener('click', () => {
-    vaState.groupSize = Math.max(1, vaState.groupSize - 1);
-    vaRenderPanel(q);
-  });
-  if (groupPlus) groupPlus.addEventListener('click', () => {
-    const maxGroup = vaConvertNumerator(q);
-    vaState.groupSize = Math.min(maxGroup, vaState.groupSize + 1);
-    vaRenderPanel(q);
-  });
+  const hopMinus = panel.querySelector('.va-hop-minus');
+  const hopPlus = panel.querySelector('.va-hop-plus');
+  if (hopMinus) hopMinus.addEventListener('click', () => { vaState.hopCount = Math.max(0, vaState.hopCount - 1); vaRenderPanel(q); });
+  if (hopPlus) hopPlus.addEventListener('click', () => { vaState.hopCount = Math.min(q.whole, vaState.hopCount + 1); vaRenderPanel(q); });
 
-  const copyMinus = panel.querySelector('.va-copy-minus');
-  const copyPlus = panel.querySelector('.va-copy-plus');
-  if (copyMinus) copyMinus.addEventListener('click', () => {
-    vaState.copies = Math.max(1, vaState.copies - 1);
-    vaRenderPanel(q);
-  });
-  if (copyPlus) copyPlus.addEventListener('click', () => {
-    vaState.copies = Math.min(10, vaState.copies + 1);
+  const peelMinus = panel.querySelector('.va-peel-minus');
+  const peelPlus = panel.querySelector('.va-peel-plus');
+  if (peelMinus) peelMinus.addEventListener('click', () => { vaState.peelOff = Math.max(0, vaState.peelOff - 1); vaRenderPanel(q); });
+  if (peelPlus) peelPlus.addEventListener('click', () => {
+    vaState.peelOff = Math.min(q.right.n, vaState.peelOff + 1);
     vaRenderPanel(q);
   });
 }
